@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import MainRoute from './routes/index.tsx'
-import { ChakraProvider } from '@chakra-ui/react'
 import { RouterProvider } from 'react-router-dom'
 
 const {router} = MainRoute()

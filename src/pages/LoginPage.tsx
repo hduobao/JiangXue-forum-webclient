@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
       
           // 检查响应中是否包含Access_Token
           if (response.data.data) {
-            const token = response.data.data; // 后端返回的Access_Token
+            const token = response.data.data.AccessToken; // 后端返回的Access_Token
             localStorage.setItem('AccessToken', token); // 保存Access_Token
             navigate('/home'); // 登录成功，跳转到首页
           } else {

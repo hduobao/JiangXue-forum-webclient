@@ -9,15 +9,24 @@ import PeopleIcon from '@mui/icons-material/People';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // 导入退出图标
 import { SidebarProps } from '../types/UserModel'
+import axios from 'axios';
 
 
 
 const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('AccessToken'); // Remove token on logout
-    navigate('/login'); // Redirect to login page
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/auth/logout');
+      localStorage.removeItem('AccessToken');
+      localStorage.removeItem('RefreshToken')
+  
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+
+    }
   };
 
   return (

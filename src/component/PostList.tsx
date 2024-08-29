@@ -58,7 +58,7 @@ const PostList: React.FC = () => {
         <Typography color="error">{error}</Typography>
       ) : (
         <List>
-          {posts && posts.map(post => (
+          {posts.map(post => (
             <ListItem key={post.id} style={{ display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '16px' }}>
                 <Avatar 
