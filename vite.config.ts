@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    extensions:[".ts",".js",".tsx",".json"]
   },
   server:{
     proxy:{  //配置本地代理
@@ -24,5 +25,3 @@ export default defineConfig({
 }
 
 })
-
-// zheli

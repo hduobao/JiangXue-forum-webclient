@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { List, ListItem, ListItemText, Avatar, Typography } from '@mui/material';
 import { Visibility, Comment, ThumbUp } from '@mui/icons-material';
-import axios from 'axios';
 import { ListPostVo } from "../types/PostModel";
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
+import instance from '../interceptors/AuthInterceptor'; // 引入配置了拦截器的 axios 实例
 
 const HoverTypography = styled(Typography)(() => ({
   fontSize: '1.125rem',
@@ -27,12 +27,8 @@ const PostList: React.FC = () => {
       try {
         const offset = 1;
         const limit = 10;
-        const token = localStorage.getItem("AccessToken");
-        const response = await axios.get(`/api/1/posts/offset/${offset}/limit/${limit}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+
+        const response = await instance.get(`/api/1/posts/offset/${offset}/limit/${limit}`);
 
         setPosts(response.data.data);
       } catch (error) {

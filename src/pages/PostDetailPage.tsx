@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import instance from '../interceptors/AuthInterceptor'; // 引入配置了拦截器的 axios 实例
 import { Typography, CircularProgress, Container, Avatar } from '@mui/material';
 
 interface PostVo {
@@ -25,7 +25,7 @@ const PostDetail: React.FC = () => {
     const fetchPostDetail = async () => {
       try {
         const token = localStorage.getItem("AccessToken");
-        const response = await axios.get(`/api/1/posts/${postId}`, {
+        const response = await instance.get(`/api/1/posts/${postId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

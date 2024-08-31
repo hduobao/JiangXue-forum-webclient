@@ -3,6 +3,7 @@ import React from 'react';
 import axios from 'axios'; // 引入axios
 import { Button, TextField, Container, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { setTokens } from '../storage/storage';
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
@@ -24,7 +25,9 @@ const LoginPage: React.FC = () => {
           // 检查响应中是否包含Access_Token
           if (response.data.data) {
             const token = response.data.data.AccessToken; // 后端返回的Access_Token
-            localStorage.setItem('AccessToken', token); // 保存Access_Token
+            const refreshToken = response.data.data.RefreshToken;
+            setTokens(token, refreshToken)
+            // localStorage.setItem('AccessToken', token); // 保存Access_Token
             navigate('/home'); // 登录成功，跳转到首页
           } else {
             throw new Error('Invalid response from server');
