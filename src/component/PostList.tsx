@@ -4,7 +4,7 @@ import { Visibility, Comment, ThumbUp } from '@mui/icons-material';
 import { ListPostVo } from "../types/PostModel";
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
-import instance from '../interceptors/AuthInterceptor'; // 引入配置了拦截器的 axios 实例
+import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
 
 const HoverTypography = styled(Typography)(() => ({
   fontSize: '1.125rem',

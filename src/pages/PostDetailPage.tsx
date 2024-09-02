@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import instance from '../interceptors/AuthInterceptor'; // 引入配置了拦截器的 axios 实例
+import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
 import { Typography, CircularProgress, Container, Avatar } from '@mui/material';
 
 interface PostVo {

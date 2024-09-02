@@ -4,7 +4,7 @@ import { Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/SideBar'; // 引入 Sidebar 组件
 import PostList from '../component/PostList';
-import instance from '../interceptors/AuthInterceptor'; // 引入配置了拦截器的 axios 实例
+import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
