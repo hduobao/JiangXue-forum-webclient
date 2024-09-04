@@ -10,6 +10,6 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node"]  // 添加这一行
+    "types": ["node", "vite-plugin-svgr/client"]  // 添加这一行
   }
 }

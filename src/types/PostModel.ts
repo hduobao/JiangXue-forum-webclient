@@ -6,6 +6,7 @@ export interface ListPostVo {
     author_id: number;
     author_name: string;
     author_avatar: string;
+    cover_image: string;
     forum_id: number;
     is_essence: boolean;
     is_top: boolean;

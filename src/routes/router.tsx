@@ -3,7 +3,7 @@ import LoginPage from '../pages/LoginPage';
 import PostDetailPage from '../pages/PostDetailPage';
 import App from '../App';
 import HomePage from '../pages/HomePage';
-import ProtectedRoute from './ProtectedRoute'; // Import the ProtectedRoute component
+import ProtectedRoute from './ProtectedRoute';
 import UserProfile from '../pages/UserSpacePage';
 
 const MainRoute = () => {
@@ -13,8 +13,9 @@ const MainRoute = () => {
         <Route path="login" element={<LoginPage />} />
         <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
         <Route path="posts/:postId" element={<ProtectedRoute element={<PostDetailPage />} />} />
+        <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
+        <Route path="user-profile/:userId" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
-        <Route path='user-profile' element={<UserProfile />} />
       </Route>
     )
   );

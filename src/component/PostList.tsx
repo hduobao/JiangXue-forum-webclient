@@ -1,20 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { List, ListItem, ListItemText, Avatar, Typography } from '@mui/material';
-import { Visibility, Comment, ThumbUp } from '@mui/icons-material';
-import { ListPostVo } from "../types/PostModel";
+import React, { useEffect, useState, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { styled } from '@mui/system';
-import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
-
-const HoverTypography = styled(Typography)(() => ({
-  fontSize: '1.125rem',
-  cursor: 'pointer',
-  textDecoration: 'none',
-  transition: 'text-decoration 0.3s',
-  '&:hover': {
-    textDecoration: 'underline',
-  }
-}));
+import instance from '../interceptors/auth_interceptor';
+import { ListPostVo } from "../types/PostModel";
+import { IconHeart, IconMessageCircle, IconEye } from '@tabler/icons-react';
 
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<ListPostVo[]>([]);
@@ -42,84 +30,92 @@ const PostList: React.FC = () => {
     fetchPosts();
   }, []);
 
-  const handleTitleClick = (postId: number) => {
+  const handlePostClick = (postId: number) => {
     navigate(`/posts/${postId}`);
   };
 
+  const handleAuthorClick = (authorId: number, event: MouseEvent) => {
+    // Prevent click event from propagating to parent div
+    event.stopPropagation();
+    navigate(`/user-profile/${authorId}`);
+  };
+
+  const handleIconClick = (event: MouseEvent) => {
+    // Prevent click event from propagating to parent div
+    event.stopPropagation();
+  };
+
   return (
-    <div>
+    <div className="container mx-auto mt-8 p-4">
       {loading ? (
-        <Typography>Loading...</Typography>
+        <div className="text-lg font-semibold">Loading...</div>
       ) : error ? (
-        <Typography color="error">{error}</Typography>
+        <div className="text-red-500">{error}</div>
       ) : (
-        <List>
+        <div className="space-y-4">
           {posts.map(post => (
-            <ListItem key={post.id} style={{ display: 'flex', alignItems: 'flex-start' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '16px' }}>
-                <Avatar 
-                  src={post.author_avatar} 
-                  alt={post.author_name} 
-                  style={{ width: 80, height: 80, marginBottom: '4px' }} 
+            <div
+              key={post.id}
+              className="bg-white shadow-md rounded-lg p-4 flex space-x-4 cursor-pointer"
+              onClick={() => handlePostClick(post.id)}
+            >
+              {/* Cover Image */}
+              <div className="flex-none w-40 h-24 relative">
+                <img
+                  src={post.cover_image || '/default-cover.jpg'}
+                  alt={post.title}
+                  className="w-full h-full object-cover rounded-md"
                 />
-                <Typography 
-                  variant="body2" 
-                  style={{ 
-                    fontSize: '0.875rem', 
-                    marginTop: 'auto' 
-                  }}
+              </div>
+
+              {/* Post Content */}
+              <div className="flex-1">
+                <h2
+                  className="text-xl font-medium mb-2 cursor-pointer hover:underline"
+                  onClick={() => handlePostClick(post.id)}
                 >
-                  {post.author_name}
-                </Typography>
-              </div>
-              <div style={{ flex: 1 }}>
-                <ListItemText
-                  primary={
-                    <HoverTypography 
-                      variant="h6" 
-                      onClick={() => handleTitleClick(post.id)} 
+                  {post.title}
+                </h2>
+
+                <p className="text-gray-700 mb-2 line-clamp-2">
+                  {post.content}
+                </p>
+                <div className="flex items-center text-sm text-gray-500 space-x-4">
+                  <div
+                    className="flex items-center space-x-1"
+                    onClick={handleIconClick}
+                  >
+                    <IconEye className="w-5 h-5 text-gray-500" />
+                    <span>{post.view_count}</span>
+                  </div>
+                  <div
+                    className="flex items-center space-x-1"
+                    onClick={handleIconClick}
+                  >
+                    <IconMessageCircle className="w-5 h-5 text-gray-500" />
+                    <span>{post.comment_count}</span>
+                  </div>
+                  <div
+                    className="flex items-center space-x-1"
+                    onClick={handleIconClick}
+                  >
+                    <IconHeart className="w-5 h-5 text-gray-500" />
+                    <span>{post.like_count}</span>
+                  </div>
+                  {/* Add Author Information */}
+                  <div className="flex items-center space-x-2 ml-auto">
+                    <span
+                      className="text-gray-700 cursor-pointer hover:text-blue-500 hover:underline"
+                      onClick={(event) => handleAuthorClick(post.author_id, event)}
                     >
-                      {post.title}
-                    </HoverTypography>
-                  }
-                  secondary={
-                    <div style={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      height: 'calc(3rem + 48px)',  
-                      overflow: 'hidden'
-                    }}>
-                      <Typography 
-                        variant="body2" 
-                        style={{
-                          display: '-webkit-box',
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          WebkitLineClamp: 2,  
-                          lineHeight: '1.5rem',  
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {post.content}
-                      </Typography>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Typography variant="body2">
-                          <Visibility fontSize="small" /> {post.view_count}
-                        </Typography>
-                        <Typography variant="body2">
-                          <Comment fontSize="small" /> {post.comment_count}
-                        </Typography>
-                        <Typography variant="body2">
-                          <ThumbUp fontSize="small" /> {post.like_count}
-                        </Typography>
-                      </div>
-                    </div>
-                  }
-                />
+                      {post.author_name}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </ListItem>
+            </div>
           ))}
-        </List>
+        </div>
       )}
     </div>
   );

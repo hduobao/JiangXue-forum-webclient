@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, setTokens } from '../storage/storage';
 import { Toast } from 'antd-mobile';
-import MainRoute from '../routes';
+import MainRoute from '../routes/router';
 
 const instance = axios.create({
   timeout: 5000,
