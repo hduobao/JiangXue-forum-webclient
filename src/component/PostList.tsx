@@ -37,8 +37,10 @@ const PostList: React.FC = () => {
   const handleAuthorClick = (authorId: number, event: MouseEvent) => {
     // Prevent click event from propagating to parent div
     event.stopPropagation();
+    console.log('Navigating to user profile with authorId:', authorId); // Add this line
     navigate(`/user-profile/${authorId}`);
   };
+  
 
   const handleIconClick = (event: MouseEvent) => {
     // Prevent click event from propagating to parent div
@@ -108,7 +110,7 @@ const PostList: React.FC = () => {
                       className="text-gray-700 cursor-pointer hover:text-blue-500 hover:underline"
                       onClick={(event) => handleAuthorClick(post.author_id, event)}
                     >
-                      {post.author_name}
+                      作者：{post.author_name}
                     </span>
                   </div>
                 </div>

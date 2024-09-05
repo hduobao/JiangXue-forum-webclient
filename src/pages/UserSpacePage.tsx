@@ -5,9 +5,11 @@ import { UserBaseInfo } from '../types/UserModel';
 
 const UserProfile: React.FC = () => {
   const { authorId } = useParams<{ authorId?: string }>();
+  console.log('Author ID:', authorId); // Add this line
   const [userInfo, setUserInfo] = useState<UserBaseInfo | null>(null);
 
   useEffect(() => {
+    console.log('Author ID has changed:', authorId);
     const fetchUserInfo = async () => {
       try {
         const endpoint = authorId ? `/api/user/userInfo/${authorId}` : '/api/user/userInfo';
@@ -17,9 +19,10 @@ const UserProfile: React.FC = () => {
         console.error('Failed to fetch user info:', error);
       }
     };
-
+  
     fetchUserInfo();
   }, [authorId]);
+  
 
   if (!userInfo) {
     return <div className="text-lg font-semibold">加载中...</div>;

@@ -14,7 +14,7 @@ const MainRoute = () => {
         <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
         <Route path="posts/:postId" element={<ProtectedRoute element={<PostDetailPage />} />} />
         <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
-        <Route path="user-profile/:userId" element={<ProtectedRoute element={<UserProfile />} />} />
+        <Route path="user-profile/:authorId" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
       </Route>
     )

@@ -7,6 +7,7 @@ const instance = axios.create({
   timeout: 5000,
 });
 
+
 async function handleResponseError(error: any) {
   const navigate = MainRoute().router.navigate;
 
@@ -48,10 +49,12 @@ async function handleResponseError(error: any) {
     error.config.headers.Authorization = `Bearer ${AccessToken}`;
     return instance.request(error.config);
   } catch (err) {
+    console.error('Error occurred:', err);
     Toast.show('登录信息过期');
     navigate('/login', { replace: true });
     return Promise.reject(err);
   }
+  
 }
 
 instance.interceptors.request.use(
