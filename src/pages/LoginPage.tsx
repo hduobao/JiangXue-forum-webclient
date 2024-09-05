@@ -1,44 +1,45 @@
 // LoginPage.tsx
 import React from 'react';
-import axios from 'axios'; // 引入axios
+import Instance from '../interceptors/auth_interceptor';
 import { Button, TextField, Container, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { setTokens } from '../storage/storage';
 
 const LoginPage: React.FC = () => {
-    const navigate = useNavigate();
+  const instance = Instance()
+  const navigate = useNavigate();
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        // 从表单中获取数据
-        const formData = new FormData(event.currentTarget);
-        const account = formData.get('account');
-        const password = formData.get('password');
-      
-        try {
-          // 发送POST请求到后端登录接口
-          const response = await axios.post('/api/auth/login', {
-            account: account,
-            password: password
-          });
-      
-          // 检查响应中是否包含Access_Token
-          if (response.data.data) {
-            const token = response.data.data.AccessToken; // 后端返回的Access_Token
-            const refreshToken = response.data.data.RefreshToken;
-            setTokens(token, refreshToken)
-            // localStorage.setItem('AccessToken', token); // 保存Access_Token
-            navigate('/home'); // 登录成功，跳转到首页
-          } else {
-            throw new Error('Invalid response from server');
-          }
-        } catch (error) {
-          // 处理错误，例如网络问题或后端服务错误
-          console.error('Login error:', error);
-          alert('用户名或密码错误或服务器出现问题');
-        }
-        console.log('Form submitted');
-      };
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // 从表单中获取数据
+    const formData = new FormData(event.currentTarget);
+    const account = formData.get('account');
+    const password = formData.get('password');
+
+    try {
+      // 发送POST请求到后端登录接口
+      const response = await instance.post('/api/auth/login', {
+        account: account,
+        password: password
+      });
+
+      // 检查响应中是否包含Access_Token
+      if (response.data.data) {
+        const token = response.data.data.AccessToken; // 后端返回的Access_Token
+        const refreshToken = response.data.data.RefreshToken;
+        setTokens(token, refreshToken)
+        // localStorage.setItem('AccessToken', token); // 保存Access_Token
+        navigate('/home'); // 登录成功，跳转到首页
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      // 处理错误，例如网络问题或后端服务错误
+      console.error('Login error:', error);
+      alert('用户名或密码错误或服务器出现问题');
+    }
+    console.log('Form submitted');
+  };
 
   return (
     <Container component="main" maxWidth="xs">

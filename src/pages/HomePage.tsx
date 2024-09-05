@@ -3,9 +3,11 @@ import { Typography, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/SideBar'; // 引入 Sidebar 组件
 import PostList from '../component/PostList';
-import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
+// import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
+import Instance from '../interceptors/auth_interceptor';
 
 const HomePage: React.FC = () => {
+  const instance = Instance()
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({avatar: '', username: ''});
 

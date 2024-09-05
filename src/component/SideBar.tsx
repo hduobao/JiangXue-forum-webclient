@@ -9,10 +9,11 @@ import PeopleIcon from '@mui/icons-material/People';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // 导入退出图标
 import { SidebarProps } from '../types/UserModel'
-import instance from '../interceptors/auth_interceptor';
+import Instance from '../interceptors/auth_interceptor';
 import { removeTokens } from '../storage/storage'
 
 const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
+  const instance = Instance()
   const navigate = useNavigate();
 
   const handleLogout = async () => {

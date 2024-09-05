@@ -1,6 +1,6 @@
 import React, { useEffect, useState, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import instance from '../interceptors/auth_interceptor';
+import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from "../types/PostModel";
 import { IconHeart, IconMessageCircle, IconEye } from '@tabler/icons-react';
 
@@ -8,6 +8,7 @@ const PostList: React.FC = () => {
   const [posts, setPosts] = useState<ListPostVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const instance = Instance()
   const navigate = useNavigate();
 
   useEffect(() => {
