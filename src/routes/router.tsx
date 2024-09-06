@@ -5,6 +5,7 @@ import App from '../App';
 import HomePage from '../pages/HomePage';
 import ProtectedRoute from './ProtectedRoute';
 import UserProfile from '../pages/UserSpacePage';
+import MessageCenter from '../pages/MessageCenter';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -15,6 +16,7 @@ const MainRoute = () => {
         <Route path="posts/:postId" element={<ProtectedRoute element={<PostDetailPage />} />} />
         <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route path="user-profile/:authorId" element={<ProtectedRoute element={<UserProfile />} />} />
+        <Route path="message" element={<ProtectedRoute element={<MessageCenter />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
       </Route>
     )

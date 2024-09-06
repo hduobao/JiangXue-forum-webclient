@@ -1,40 +1,33 @@
-// LoginPage.tsx
 import React from 'react';
 import Instance from '../interceptors/auth_interceptor';
-import { Button, TextField, Container, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { setTokens } from '../storage/storage';
 
 const LoginPage: React.FC = () => {
-  const instance = Instance()
+  const instance = Instance();
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // 从表单中获取数据
     const formData = new FormData(event.currentTarget);
     const account = formData.get('account');
     const password = formData.get('password');
 
     try {
-      // 发送POST请求到后端登录接口
       const response = await instance.post('/api/auth/login', {
         account: account,
-        password: password
+        password: password,
       });
 
-      // 检查响应中是否包含Access_Token
       if (response.data.data) {
-        const token = response.data.data.AccessToken; // 后端返回的Access_Token
+        const token = response.data.data.AccessToken;
         const refreshToken = response.data.data.RefreshToken;
-        setTokens(token, refreshToken)
-        // localStorage.setItem('AccessToken', token); // 保存Access_Token
-        navigate('/home'); // 登录成功，跳转到首页
+        setTokens(token, refreshToken);
+        navigate('/home');
       } else {
         throw new Error('Invalid response from server');
       }
     } catch (error) {
-      // 处理错误，例如网络问题或后端服务错误
       console.error('Login error:', error);
       alert('用户名或密码错误或服务器出现问题');
     }
@@ -42,66 +35,45 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center', // Center vertically
-          minHeight: '100vh', // Full viewport height
-          py: 8, // Padding top and bottom
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            p: 3,
-            borderRadius: 1,
-            boxShadow: 3,
-            backgroundColor: 'background.paper', // Optional: for better visibility
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            登录
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
+    <div className="flex items-center justify-center min-h-screen py-8">
+      <div className="flex flex-col items-center w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold">登录</h1>
+        <form className="w-full mt-4" onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="account" className="block text-sm font-medium">
+              账号
+            </label>
+            <input
               id="account"
-              label="账号"
               name="account"
-              autoComplete="account"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
+              type="text"
               required
-              fullWidth
+              autoComplete="account"
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium">
+              密码
+            </label>
+            <input
               id="password"
-              label="密码"
               name="password"
               type="password"
+              required
               autoComplete="current-password"
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              登录
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </Container>
+          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            登录
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

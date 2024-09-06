@@ -1,27 +1,18 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Divider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import MessageIcon from '@mui/icons-material/Message';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import HistoryIcon from '@mui/icons-material/History';
-import PeopleIcon from '@mui/icons-material/People';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // 导入退出图标
+import { IconHome, IconMessageCircle, IconBookmark, IconHistory, IconUsers, IconHeart, IconLogout } from '@tabler/icons-react'; // 引入tabler icons
 import { SidebarProps } from '../types/UserModel'
 import Instance from '../interceptors/auth_interceptor';
-import { removeTokens } from '../storage/storage'
+import { removeTokens } from '../storage/storage';
 
 const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
-  const instance = Instance()
+  const instance = Instance();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await instance.post('/api/auth/logout');
-      
-      removeTokens()
-  
+      removeTokens();
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -30,91 +21,90 @@ const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
 
   const handleProfileClick = async () => {
     try {
-      // const response = await instance.get('/api/user/userInfo');
-      // Assuming the response contains the user's profile data.
-      // console.log('User Info:', response.data);
-      navigate('/user-profile'); // 假设个人空间页面路由是 /user-profile
+      navigate('/user-profile');
     } catch (error) {
       console.error('Failed to fetch user info:', error);
     }
   };
 
+  const handleMessageClick = async () => {
+    try {
+      navigate('/message');
+    } catch (error) {
+      console.error('Failed to route message center:', error);
+    }
+  }
+
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 240,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { 
-          width: 240, 
-          boxSizing: 'border-box', 
-          backgroundColor: '#f0f0f0', // 灰色背景
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-          borderRadius: '8px', // 使边角圆润
-          position: 'fixed', // 固定位置
-          top: 0, // 顶部对齐
-          left: 0, // 左侧对齐
-          height: '100vh', // 高度为视口高度
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mt: 2,
-          pb: 2,
-          cursor: 'pointer', // 添加鼠标悬浮效果
-        }}
+    <div className="w-60 h-screen bg-gray-100 shadow-lg flex flex-col fixed top-0 left-0">
+      {/* 用户信息 */}
+      <div
+        className="flex flex-col items-center mt-4 cursor-pointer"
         onClick={handleProfileClick} // 添加点击事件
       >
-        <Avatar
-          alt="User Avatar"
+        <img
           src={avatar || "/static/images/avatar/1.jpg"}
-          sx={{ width: 64, height: 64 }}
+          alt="User Avatar"
+          className="w-16 h-16 rounded-full object-cover" // 这里增加了 object-cover
         />
-        <Typography variant="h6" sx={{ mt: 1 }}>
-          {username || "用户昵称"}
-        </Typography>
-      </Box>
-      <Divider />
-      <List>
-        <ListItem button>
-          <ListItemIcon><HomeIcon /></ListItemIcon>
-          <ListItemText primary="首页" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemIcon><MessageIcon /></ListItemIcon>
-          <ListItemText primary="消息" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemIcon><BookmarkIcon /></ListItemIcon>
-          <ListItemText primary="收藏" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemIcon><HistoryIcon /></ListItemIcon>
-          <ListItemText primary="历史" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemIcon><FavoriteIcon /></ListItemIcon>
-          <ListItemText primary="关注" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemIcon><PeopleIcon /></ListItemIcon>
-          <ListItemText primary="粉丝" />
-        </ListItem>
-        <ListItem button onClick={handleLogout}>
-          <ListItemIcon><ExitToAppIcon /></ListItemIcon>
-          <ListItemText primary="退出" />
-        </ListItem>
-      </List>
-    </Drawer>
+
+        <p className="mt-2 text-lg font-semibold">{username || "用户昵称"}</p>
+      </div>
+
+      {/* 分割线 */}
+      <div className="mt-4 w-full border-t border-gray-300"></div>
+
+      {/* 导航菜单 */}
+      <ul className="flex-grow mt-6">
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left" onClick={() => navigate('/')}>
+            <IconHome className="mr-3 text-gray-600" />
+            <span className="text-gray-800">首页</span>
+          </button>
+        </li>
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left" onClick={handleMessageClick}>
+            <IconMessageCircle className="mr-3 text-gray-600" />
+            <span className="text-gray-800">消息</span>
+          </button>
+        </li>
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left">
+            <IconBookmark className="mr-3 text-gray-600" />
+            <span className="text-gray-800">收藏</span>
+          </button>
+        </li>
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left">
+            <IconHistory className="mr-3 text-gray-600" />
+            <span className="text-gray-800">历史</span>
+          </button>
+        </li>
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left">
+            <IconHeart className="mr-3 text-gray-600" />
+            <span className="text-gray-800">关注</span>
+          </button>
+        </li>
+        <li className="hover:bg-gray-200">
+          <button className="flex items-center p-4 w-full text-left">
+            <IconUsers className="mr-3 text-gray-600" />
+            <span className="text-gray-800">粉丝</span>
+          </button>
+        </li>
+      </ul>
+
+      {/* 退出按钮 */}
+      <div className="border-t border-gray-300">
+        <button
+          className="flex items-center p-4 w-full text-left hover:bg-gray-200"
+          onClick={handleLogout}
+        >
+          <IconLogout className="mr-3 text-gray-600" />
+          <span className="text-gray-800">退出</span>
+        </button>
+      </div>
+    </div>
   );
 };
 

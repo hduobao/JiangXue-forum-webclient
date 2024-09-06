@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/SideBar'; // 引入 Sidebar 组件
 import PostList from '../component/PostList';
-// import instance from '../interceptors/auth_interceptor'; // 引入配置了拦截器的 axios 实例
+import Navbar from '../component/TopNavigationBar';
 import Instance from '../interceptors/auth_interceptor';
 
 const HomePage: React.FC = () => {
-  const instance = Instance()
+  const instance = Instance();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState({avatar: '', username: ''});
+  const [userInfo, setUserInfo] = useState({ avatar: '', username: '' });
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -29,18 +28,24 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar avatar={userInfo.avatar} username={userInfo.username} /> {/* 左侧导航栏 */}
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3 }}
-      >
-        <Typography variant="h4">首页内容</Typography>
-        {/* 你可以在这里添加首页的其他内容 */}
-        <PostList /> {/* 引入 PostList 组件 */}
-      </Box>
-    </Box>
+    <div className="flex h-screen">
+      {/* 左侧导航栏 */}
+      <Sidebar avatar={userInfo.avatar} username={userInfo.username} />
+  
+      {/* 主内容区域 */}
+      <main className="flex-grow p-0 ml-60">  {/* 添加了 ml-60 确保主内容区域避开侧边栏 */}
+        {/* 顶部导航栏 */}
+        <Navbar />
+        
+        {/* PostList 组件，用于展示帖子 */}
+        <div className="p-6">
+          <PostList />
+        </div>
+      </main>
+    </div>
   );
+  
+  
 };
 
 export default HomePage;
