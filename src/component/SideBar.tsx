@@ -35,6 +35,22 @@ const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
     }
   }
 
+  const handleFollowClick = async () => {
+    try {
+      navigate('/follows');
+    } catch (error) {
+      console.error('Failed to fetch user follow list:', error);
+    }
+  }
+
+  const handleFansClick = async () => {
+    try {
+      navigate('/fans');
+    } catch (error) {
+      console.error('Failed to fetch user fans list:', error);
+    }
+  }
+
   return (
     <div className="w-60 h-screen bg-gray-100 shadow-lg flex flex-col fixed top-0 left-0">
       {/* 用户信息 */}
@@ -81,13 +97,13 @@ const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
           </button>
         </li>
         <li className="hover:bg-gray-200">
-          <button className="flex items-center p-4 w-full text-left">
+          <button className="flex items-center p-4 w-full text-left" onClick={handleFollowClick}>
             <IconHeart className="mr-3 text-gray-600" />
             <span className="text-gray-800">关注</span>
           </button>
         </li>
         <li className="hover:bg-gray-200">
-          <button className="flex items-center p-4 w-full text-left">
+          <button className="flex items-center p-4 w-full text-left" onClick={handleFansClick}>
             <IconUsers className="mr-3 text-gray-600" />
             <span className="text-gray-800">粉丝</span>
           </button>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IconRepeat, IconAt, IconMail, IconBell } from '@tabler/icons-react';
 
-const MessageCenter: React.FC = () => {
+const MessageCenterPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('replies'); // 设置默认 Tab 为 "回复我的"
 
   const messages = {
@@ -88,4 +88,4 @@ const MessageCenter: React.FC = () => {
   );
 };
 
-export default MessageCenter;
+export default MessageCenterPage;
