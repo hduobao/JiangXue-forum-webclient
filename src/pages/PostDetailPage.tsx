@@ -6,19 +6,19 @@ import { IconThumbUp, IconShare, IconMessage2 } from '@tabler/icons-react';
 
 const PostDetail: React.FC = () => {
   const instance = Instance();
-  const { postId } = useParams<{ postId: string }>();
+  const { postID } = useParams<{ postID: string }>();
   const [post, setPost] = useState<PostVo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false); // 存储关注状态
-  const [followError, setFollowError] = useState<string | null>(null);
+  const [, setFollowError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
         const token = localStorage.getItem("AccessToken");
-        const response = await instance.get(`/api/1/posts/${postId}`, {
+        const response = await instance.get(`/api/1/posts/${postID}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,7 +41,7 @@ const PostDetail: React.FC = () => {
     };
 
     fetchPostDetail();
-  }, [postId]);
+  }, [postID]);
 
   const handleAuthorClick = () => {
     navigate(`/user-profile/${post?.author_id}`);
@@ -137,7 +137,7 @@ const PostDetail: React.FC = () => {
         <div className="flex">
           {/* 点赞按钮 */}
           <button className="flex items-center mr-4">
-            <IconThumbUp size={20} className="text-red-500" />
+            <IconThumbUp size={20} className="text-black-500" />
             <span className="ml-1">Like</span>
           </button>
 

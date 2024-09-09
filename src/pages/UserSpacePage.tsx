@@ -5,14 +5,14 @@ import { UserBaseInfo } from '../types/UserModel';
 
 const UserProfile: React.FC = () => {
   const instance = Instance();
-  const { authorId } = useParams<{ authorId?: string }>();
+  const { authorID } = useParams<{ authorID?: string }>();
   const [userInfo, setUserInfo] = useState<UserBaseInfo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const endpoint = authorId ? `/api/user/userInfo/${authorId}` : '/api/user/userInfo';
+        const endpoint = authorID ? `/api/user/userInfo/${authorID}` : '/api/user/userInfo';
         const response = await instance.get(endpoint);
         setUserInfo(response.data.data);
       } catch (error) {
@@ -21,7 +21,7 @@ const UserProfile: React.FC = () => {
     };
 
     fetchUserInfo();
-  }, [authorId]);
+  }, [authorID]);
 
   if (!userInfo) {
     return <div className="text-lg font-semibold">加载中...</div>;

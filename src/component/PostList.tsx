@@ -2,7 +2,7 @@ import React, { useEffect, useState, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from "../types/PostModel";
-import { IconHeart, IconMessageCircle, IconEye } from '@tabler/icons-react';
+import { IconThumbUp, IconMessage2, IconEye } from '@tabler/icons-react';
 
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<ListPostVo[]>([]);
@@ -31,15 +31,15 @@ const PostList: React.FC = () => {
     fetchPosts();
   }, []);
 
-  const handlePostClick = (postId: number) => {
-    navigate(`/posts/${postId}`);
+  const handlePostClick = (postID: number) => {
+    navigate(`/posts/${postID}`);
   };
 
-  const handleAuthorClick = (authorId: number, event: MouseEvent) => {
+  const handleAuthorClick = (authorID: number, event: MouseEvent) => {
     // Prevent click event from propagating to parent div
     event.stopPropagation();
-    console.log('Navigating to user profile with authorId:', authorId); // Add this line
-    navigate(`/user-profile/${authorId}`);
+    console.log('Navigating to user profile with authorID:', authorID); // Add this line
+    navigate(`/user-profile/${authorID}`);
   };
   
 
@@ -95,14 +95,14 @@ const PostList: React.FC = () => {
                     className="flex items-center space-x-1"
                     onClick={handleIconClick}
                   >
-                    <IconMessageCircle className="w-5 h-5 text-gray-500" />
+                    <IconMessage2 className="w-5 h-5 text-gray-500" />
                     <span>{post.comment_count}</span>
                   </div>
                   <div
                     className="flex items-center space-x-1"
                     onClick={handleIconClick}
                   >
-                    <IconHeart className="w-5 h-5 text-gray-500" />
+                    <IconThumbUp className="w-5 h-5 text-gray-500" />
                     <span>{post.like_count}</span>
                   </div>
                   {/* Add Author Information */}
