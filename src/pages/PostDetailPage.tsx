@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { PostVo } from '../types/PostModel';
-import { IconThumbUp, IconShare, IconMessage2 } from '@tabler/icons-react';
+import { IconThumbUp, IconShare, IconMessage2, IconBookmark } from '@tabler/icons-react'; // 引入收藏图标
 
 const PostDetail: React.FC = () => {
   const instance = Instance();
@@ -12,6 +12,8 @@ const PostDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false); // 存储关注状态
   const [, setFollowError] = useState<string | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false); // 收藏状态
+  const [, setBookmarkError] = useState<string | null>(null); // 收藏错误状态
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,9 +34,13 @@ const PostDetail: React.FC = () => {
           },
         });
         setIsFollowing(followResponse.data.data); // 设置关注状态（true/false）
+
+        // 获取收藏状态
+        const bookmarkResponse = await instance.get(`/api/user/favorite/${postID}`);
+        setIsBookmarked(bookmarkResponse.data.data); // 设置收藏状态（true/false）
       } catch (error) {
-        console.error('Failed to fetch post details or follow status:', error);
-        setError('Failed to load post details or follow status');
+        console.error('Failed to fetch post details, follow status, or bookmark status:', error);
+        setError('Failed to load post details, follow status, or bookmark status');
       } finally {
         setLoading(false);
       }
@@ -61,6 +67,19 @@ const PostDetail: React.FC = () => {
     } catch (error) {
       console.error('Failed to update follow status:', error);
       setFollowError('Failed to update follow status');
+    }
+  };
+
+  // 处理收藏逻辑
+  const handleBookmark = async () => {
+    if (!post) return;
+
+    try {
+      await instance.post(`/api/post/favorite/${postID}`);
+      setIsBookmarked((prev) => !prev); // 切换收藏状态
+    } catch (error) {
+      console.error('Failed to update bookmark status:', error);
+      setBookmarkError('Failed to update bookmark status');
     }
   };
 
@@ -145,6 +164,12 @@ const PostDetail: React.FC = () => {
           <button className="flex items-center mr-4">
             <IconShare size={20} className="text-gray-500" />
             <span className="ml-1">Share</span>
+          </button>
+
+          {/* 收藏按钮 */}
+          <button className="flex items-center mr-4" onClick={handleBookmark}>
+            <IconBookmark size={20} className={isBookmarked ? "text-blue-500" : "text-gray-500"} />
+            <span className="ml-1">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
           </button>
         </div>
 
