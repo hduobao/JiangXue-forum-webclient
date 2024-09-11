@@ -57,7 +57,6 @@ const UserProfile: React.FC = () => {
           <div className="flex-grow ml-6">
             <h2 className="text-lg font-semibold mb-4">个人信息</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Display user information here */}
               <div>
                 <p className="text-gray-500">账户</p>
                 <p>{userInfo.account}</p>
@@ -92,6 +91,12 @@ const UserProfile: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Bio Section */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-4">个人简介</h2>
+          <p className="text-gray-600">{userInfo.bio || '该用户没有填写个人简介'}</p>
         </div>
       </div>
 
