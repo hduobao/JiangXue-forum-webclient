@@ -70,7 +70,7 @@ const FavoritesPage: React.FC = () => {
                   <div className="flex items-center text-sm text-gray-500 space-x-4">
                     <div className="flex items-center space-x-1">
                       <IconHeart className="w-5 h-5 text-gray-500" />
-                      <span>{post.like_count}</span>
+                      <span>{post.interactive_info.like_count}</span>
                     </div>
                   </div>
                 </div>

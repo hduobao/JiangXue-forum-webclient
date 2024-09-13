@@ -2,13 +2,13 @@ import React, { useEffect, useState, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from "../types/PostModel";
-import { IconHeart, IconMessageCircle, IconEye } from '@tabler/icons-react';
+import { IconThumbUp, IconThumbUpFilled, IconMessage2, IconEye } from '@tabler/icons-react';
 
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<ListPostVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const instance = Instance()
+  const instance = Instance();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const PostList: React.FC = () => {
       try {
         const offset = 1;
         const limit = 10;
-  
+
         // 使用查询参数传递 offset 和 limit
         const response = await instance.get(`/api/1/posts`, {
           params: {
@@ -24,7 +24,7 @@ const PostList: React.FC = () => {
             limit,  // limit=10
           },
         });
-  
+
         setPosts(response.data.data);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
@@ -33,10 +33,9 @@ const PostList: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchPosts();
   }, []);
-  
 
   const handlePostClick = (postId: number) => {
     navigate(`/posts/${postId}`);
@@ -45,15 +44,44 @@ const PostList: React.FC = () => {
   const handleAuthorClick = (authorId: number, event: MouseEvent) => {
     // Prevent click event from propagating to parent div
     event.stopPropagation();
-    console.log('Navigating to user profile with authorId:', authorId); // Add this line
+    console.log('Navigating to user profile with authorId:', authorId);
     navigate(`/user-profile/${authorId}`);
   };
-  
 
   const handleIconClick = (event: MouseEvent) => {
     // Prevent click event from propagating to parent div
     event.stopPropagation();
   };
+
+  const handleLike = async (postId: number, isLiked: boolean, event: MouseEvent) => {
+    // 阻止事件传播，防止点击点赞后跳转到详情页
+    event.stopPropagation();
+
+    try {
+      // 发送请求以更新点赞状态（你可以根据后端实现调整这里）
+      await instance.post(`/api/posts/${postId}/like`);
+
+      // 更新本地状态，切换点赞状态和点赞数量
+      setPosts(posts.map(post =>
+        post.id === postId
+          ? {
+            ...post,
+            interactive_info: {
+              ...post.interactive_info,
+              is_like: !isLiked, // 切换点赞状态
+              like_count: isLiked
+                ? post.interactive_info.like_count - 1 // 如果已经点赞，则减少
+                : post.interactive_info.like_count + 1 // 如果未点赞，则增加
+            }
+          }
+          : post
+      ));
+    } catch (error) {
+      console.error('Failed to update like status:', error);
+    }
+  };
+
+
 
   return (
     <div className="container mx-auto mt-8 p-4">
@@ -96,22 +124,28 @@ const PostList: React.FC = () => {
                     onClick={handleIconClick}
                   >
                     <IconEye className="w-5 h-5 text-gray-500" />
-                    <span>{post.view_count}</span>
+                    <span>{post.interactive_info.view_count}</span>
                   </div>
                   <div
                     className="flex items-center space-x-1"
                     onClick={handleIconClick}
                   >
-                    <IconMessageCircle className="w-5 h-5 text-gray-500" />
-                    <span>{post.comment_count}</span>
+                    <IconMessage2 className="w-5 h-5 text-gray-500" />
+                    <span>{post.interactive_info.comment_count}</span>
                   </div>
                   <div
                     className="flex items-center space-x-1"
-                    onClick={handleIconClick}
+                    onClick={(event) => handleLike(post.id, post.interactive_info.is_like, event)}
                   >
-                    <IconHeart className="w-5 h-5 text-gray-500" />
-                    <span>{post.like_count}</span>
+                    {post.interactive_info.is_like ? (
+                      <IconThumbUpFilled size={24} className="text-pink-500" /> // 点赞后的图标和颜色
+                    ) : (
+                      <IconThumbUp size={24} className="text-gray-500" /> // 未点赞时的图标和颜色
+                    )}
+                    <span className="ml-1">{post.interactive_info.like_count}</span> {/* 点赞数 */}
                   </div>
+
+
                   {/* Add Author Information */}
                   <div className="flex items-center space-x-2 ml-auto">
                     <span
