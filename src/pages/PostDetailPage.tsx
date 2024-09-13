@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { PostVo } from '../types/PostModel';
-import { IconThumbUp, IconShare, IconMessage2, IconBookmark } from '@tabler/icons-react'; // 引入收藏图标
+import { IconThumbUp, IconThumbUpFilled, IconShare, IconMessage2, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react'; // 引入 IconBookmarkFilled
 
 const PostDetail: React.FC = () => {
   const instance = Instance();
@@ -10,37 +10,33 @@ const PostDetail: React.FC = () => {
   const [post, setPost] = useState<PostVo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFollowing, setIsFollowing] = useState<boolean>(false); // 存储关注状态
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [, setFollowError] = useState<string | null>(null);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false); // 收藏状态
-  const [, setBookmarkError] = useState<string | null>(null); // 收藏错误状态
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [, setBookmarkError] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [likeCount, setLikeCount] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        const token = localStorage.getItem("AccessToken");
-        const response = await instance.get(`/api/1/posts/${postID}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await instance.get(`/api/1/posts/${postID}`);
         setPost(response.data.data);
 
-        // 获取当前关注状态
-        const followResponse = await instance.get(`/api/user/follow/${response.data.data.author_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setIsFollowing(followResponse.data.data); // 设置关注状态（true/false）
+        const followResponse = await instance.get(`/api/me/follows/${response.data.data.author_id}/status`);
+        setIsFollowing(followResponse.data.data);
 
-        // 获取收藏状态
-        const bookmarkResponse = await instance.get(`/api/user/favorite/${postID}`);
-        setIsBookmarked(bookmarkResponse.data.data); // 设置收藏状态（true/false）
+        const bookmarkResponse = await instance.get(`/api/me/favorites/${postID}/status`);
+        setIsBookmarked(bookmarkResponse.data.data);
+
+        const likeResponse = await instance.get(`/api/posts/${postID}/like/status`);
+        setIsLiked(likeResponse.data.data);
+        // setLikeCount(likeResponse.data.data.like_count);
+
       } catch (error) {
-        console.error('Failed to fetch post details, follow status, or bookmark status:', error);
-        setError('Failed to load post details, follow status, or bookmark status');
+        console.error('Failed to fetch post details:', error);
+        setError('Failed to load post details');
       } finally {
         setLoading(false);
       }
@@ -57,26 +53,32 @@ const PostDetail: React.FC = () => {
     if (!post) return;
 
     try {
-      const token = localStorage.getItem("AccessToken");
-      await instance.post(`/api/user/follow/${post.author_id}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setIsFollowing((prev) => !prev); // 切换关注状态
+      await instance.post(`/api/me/follows/${post.author_id}`);
+      setIsFollowing((prev) => !prev);
     } catch (error) {
       console.error('Failed to update follow status:', error);
       setFollowError('Failed to update follow status');
     }
   };
 
-  // 处理收藏逻辑
+  const handleLike = async () => {
+    if (!post) return;
+
+    try {
+      await instance.post(`/api/posts/${postID}/like`);
+      setIsLiked((prev) => !prev);
+      setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
+    } catch (error) {
+      console.error('Failed to update like status:', error);
+    }
+  };
+
   const handleBookmark = async () => {
     if (!post) return;
 
     try {
-      await instance.post(`/api/post/favorite/${postID}`);
-      setIsBookmarked((prev) => !prev); // 切换收藏状态
+      await instance.post(`/api/posts/${postID}/favorite`);
+      setIsBookmarked((prev) => !prev);
     } catch (error) {
       console.error('Failed to update bookmark status:', error);
       setBookmarkError('Failed to update bookmark status');
@@ -101,27 +103,23 @@ const PostDetail: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      {/* 帖子标题和作者信息 */}
       <div className="flex justify-between items-start mb-4">
         <div>
           <h1 className="text-3xl font-bold">{post.title}</h1>
           <div className="flex items-center mt-2">
-            {/* 作者头像 */}
             <img
               src={post.author_avatar}
               alt={post.author_name}
               className="w-16 h-16 rounded-full mr-2 object-cover cursor-pointer"
-              onClick={handleAuthorClick} // 点击头像触发跳转
+              onClick={handleAuthorClick}
             />
-            {/* 作者信息 */}
             <div>
               <p
                 className="text-base font-semibold cursor-pointer"
-                onClick={handleAuthorClick} // 点击作者名触发跳转
+                onClick={handleAuthorClick}
               >
                 {post.author_name}
               </p>
-              {/* 关注/取消关注按钮 */}
               <button
                 onClick={handleFollow}
                 className={`mt-2 py-1 px-3 rounded ${isFollowing ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
@@ -133,58 +131,53 @@ const PostDetail: React.FC = () => {
         </div>
       </div>
 
-
-      {/* 帖子统计信息和发布时间 */}
       <div className="flex justify-between items-center mb-4">
-        {/* 帖子统计信息 */}
         <div className="text-sm text-gray-600">
-          Views: {post.view_count} | Comments: {post.comment_count} | Likes: {post.like_count}
+          {/* Views: {post.view_count} | Comments: {post.comment_count} | Likes: {likeCount} */}
         </div>
-        {/* 发布时间 */}
-        <div className="text-sm text-gray-500">
-          Posted on {post.created_at}
-        </div>
+        <div className="text-sm text-gray-500">Posted on {post.created_at}</div>
       </div>
 
-      {/* 帖子内容 */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <p className="text-base leading-relaxed">{post.content}</p>
       </div>
 
-      {/* 互动按钮 */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex">
-          {/* 点赞按钮 */}
-          <button className="flex items-center mr-4">
-            <IconThumbUp size={20} className="text-black-500" />
-            <span className="ml-1">Like</span>
+          <button className="flex items-center mr-4" onClick={handleLike}>
+            {isLiked ? (
+              <IconThumbUpFilled size={24} fill="red" className="text-red-500" />
+            ) : (
+              <IconThumbUp size={24} fill="none" className="text-gray-500" />
+            )}
+            <span className="ml-1">{isLiked ? 'Liked' : 'Like'}</span>
           </button>
 
-          {/* 分享按钮 */}
+          <button className="flex items-center mr-4" onClick={handleBookmark}>
+            {isBookmarked ? (
+              <IconBookmarkFilled size={24} fill="#FFC107" className="text-yellow-600" />
+            ) : (
+              <IconBookmark size={24} fill="none" className="text-gray-500" />
+            )}
+            <span className="ml-1">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+          </button>
+
           <button className="flex items-center mr-4">
-            <IconShare size={20} className="text-gray-500" />
+            <IconShare size={24} className="text-blue-500" />
             <span className="ml-1">Share</span>
           </button>
 
-          {/* 收藏按钮 */}
-          <button className="flex items-center mr-4" onClick={handleBookmark}>
-            <IconBookmark size={20} className={isBookmarked ? "text-blue-500" : "text-gray-500"} />
-            <span className="ml-1">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
-          </button>
         </div>
 
-        {/* 评论按钮 */}
         <button className="flex items-center text-gray-500">
-          <IconMessage2 size={20} />
+          <IconMessage2 size={24} />
           <span className="ml-1">Comment</span>
         </button>
       </div>
 
-      {/* 评论区域 */}
       <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-6">
         <h3 className="text-lg font-semibold mb-4">Comments</h3>
         <p className="text-gray-600">No comments yet. Be the first to comment!</p>
-        {/* 评论表单可以在这里添加 */}
       </div>
     </div>
   );

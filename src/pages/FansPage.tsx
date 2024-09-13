@@ -12,7 +12,7 @@ const FansPage: React.FC = () => {
     useEffect(() => {
         const fetchFans = async () => {
             try {
-                const response = await instance.get('/api/user/fans');
+                const response = await instance.get('/api/me/fans');
                 setFans(response.data.data);
             } catch (error) {
                 console.error('Failed to fetch fans:', error);

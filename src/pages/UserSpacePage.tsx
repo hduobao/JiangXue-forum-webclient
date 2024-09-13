@@ -12,7 +12,7 @@ const UserProfile: React.FC = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const endpoint = authorID ? `/api/user/userInfo/${authorID}` : '/api/user/userInfo';
+        const endpoint = authorID ? `/api/users/${authorID}/info` : '/api/me/info';
         const response = await instance.get(endpoint);
         setUserInfo(response.data.data);
       } catch (error) {

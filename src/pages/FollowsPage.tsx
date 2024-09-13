@@ -13,7 +13,7 @@ const FollowsPage: React.FC = () => {
     useEffect(() => {
         const fetchFollowList = async () => {
             try {
-                const response = await instance.get('/api/user/follows');
+                const response = await instance.get('/api/me/follows');
                 setFollowers(response.data.data); // 假设返回的数据在 response.data.data
             } catch (error) {
                 console.error('Failed to fetch follow list:', error);

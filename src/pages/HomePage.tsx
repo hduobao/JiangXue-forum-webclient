@@ -13,7 +13,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await instance.get("/api/user/userHomeInfo");
+        const response = await instance.get("/api/me/home");
         setUserInfo({
           avatar: response.data.data.avatar,
           username: response.data.data.username,
