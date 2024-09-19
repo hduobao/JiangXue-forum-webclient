@@ -3,9 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { PostVo } from '../types/PostModel';
 import { IconThumbUp, IconThumbUpFilled, IconShare, IconMessage2, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react'; // 引入 IconBookmarkFilled
+import GetDeviceInfo from '../component/UseDeviceInfo';
 
 const PostDetail: React.FC = () => {
   const instance = Instance();
+  const deviceInfo = GetDeviceInfo();
   const { postID } = useParams<{ postID: string }>();
   const [post, setPost] = useState<PostVo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,20 +21,24 @@ const PostDetail: React.FC = () => {
   const [likeCount, setLikeCount] = useState<number>(0); // 点赞数状态
   const navigate = useNavigate();
 
+  const [visitedAt, setVisitedAt] = useState<Date | null>(null);
+
   useEffect(() => {
+    // 记录页面加载时的时间
+    const startVisitedAt = new Date();
+    setVisitedAt(startVisitedAt);
+  
     const fetchPostDetail = async () => {
       try {
         const response = await instance.get(`/api/1/posts/${postID}`);
         const postData = response.data.data;
         setPost(postData);
   
-        // 设置初始点赞和收藏状态
         setLikeCount(postData.interactive_info.like_count);
         setFavoriteCount(postData.interactive_info.favorite_count);
         setIsLiked(postData.interactive_info.is_like);
         setIsBookmarked(postData.interactive_info.is_favorite);
   
-        // 获取关注状态
         const followResponse = await instance.get(`/api/me/follows/${postData.author_id}/status`);
         setIsFollowing(followResponse.data.data);
       } catch (error) {
@@ -44,7 +50,26 @@ const PostDetail: React.FC = () => {
     };
   
     fetchPostDetail();
-  }, [postID]);
+  
+    // 清理函数
+    return () => {
+      // 仅在组件卸载时计算和发送请求
+      const endVisitedAt = new Date();
+      const visitDuration = Math.floor((endVisitedAt.getTime() - startVisitedAt.getTime()) / 1000); // 计算停留时间（秒）
+  
+      instance.post(`/api/users/${post?.author_id}/browsing-history`, {
+        content_id: postID,
+        tab: '',
+        visited_at: startVisitedAt.toISOString(),
+        visit_duration: visitDuration,
+        device: deviceInfo.device,
+        browser: deviceInfo.browser,
+        ip_address: '',
+      }).catch((err) => {
+        console.error('Failed to save browsing history:', err);
+      });
+    };
+  }, [postID, post, deviceInfo]);
   
   
 
