@@ -9,6 +9,7 @@ import MessageCenterPage from '../pages/MessageCenterPage';
 import FollowsPage from '../pages/FollowsPage';
 import FansPage from '../pages/FansPage';
 import FavoritesPage from '../pages/FavoritesPage';
+import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -23,6 +24,7 @@ const MainRoute = () => {
         <Route path="follows" element={<ProtectedRoute element={<FollowsPage />} />} />
         <Route path="fans" element={<ProtectedRoute element={<FansPage />} />} />
         <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
+        <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
       </Route>
     )

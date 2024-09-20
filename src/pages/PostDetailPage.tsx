@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { PostVo } from '../types/PostModel';
 import { IconThumbUp, IconThumbUpFilled, IconShare, IconMessage2, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react'; // 引入 IconBookmarkFilled
@@ -20,25 +20,28 @@ const PostDetail: React.FC = () => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0); // 点赞数状态
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [visitedAt, setVisitedAt] = useState<Date | null>(null);
 
   useEffect(() => {
-    // 记录页面加载时的时间
-    const startVisitedAt = new Date();
-    setVisitedAt(startVisitedAt);
-  
+    const forumID = 1;
+
     const fetchPostDetail = async () => {
       try {
-        const response = await instance.get(`/api/1/posts/${postID}`);
+        const response = await instance.get(`/api/1/posts/${postID}`, {
+          params: {
+            forumID,
+          },
+        });
         const postData = response.data.data;
         setPost(postData);
-  
+
         setLikeCount(postData.interactive_info.like_count);
         setFavoriteCount(postData.interactive_info.favorite_count);
         setIsLiked(postData.interactive_info.is_like);
         setIsBookmarked(postData.interactive_info.is_favorite);
-  
+
         const followResponse = await instance.get(`/api/me/follows/${postData.author_id}/status`);
         setIsFollowing(followResponse.data.data);
       } catch (error) {
@@ -48,17 +51,20 @@ const PostDetail: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchPostDetail();
-  
-    // 清理函数
-    return () => {
-      // 仅在组件卸载时计算和发送请求
+
+  }, [postID]);
+
+  useEffect(() => {
+    // 记录页面加载时的时间
+    const startVisitedAt = new Date();
+    setVisitedAt(startVisitedAt);
+    const handlePopState = () => {
       const endVisitedAt = new Date();
       const visitDuration = Math.floor((endVisitedAt.getTime() - startVisitedAt.getTime()) / 1000); // 计算停留时间（秒）
-  
       instance.post(`/api/users/${post?.author_id}/browsing-history`, {
-        content_id: postID,
+        content_id: Number(postID),
         tab: '',
         visited_at: startVisitedAt.toISOString(),
         visit_duration: visitDuration,
@@ -69,13 +75,18 @@ const PostDetail: React.FC = () => {
         console.error('Failed to save browsing history:', err);
       });
     };
-  }, [postID, post, deviceInfo]);
-  
-  
+    return () => {
+      handlePopState();
+      console.log('Leaving the page:', location);
+    };
+  }, [location]);
+
+
+
 
   const handleLike = async () => {
     if (!post) return;
-  
+
     try {
       await instance.post(`/api/posts/${postID}/like`);
       setIsLiked((prev) => !prev);
@@ -84,14 +95,14 @@ const PostDetail: React.FC = () => {
       console.error('Failed to update like status:', error);
     }
   };
-  
+
   const handleBookmark = async () => {
     if (!post) return;
-  
+
     try {
       await instance.post(`/api/posts/${postID}/favorite`);
       setIsBookmarked((prev) => !prev);
-  
+
       // 更新收藏数，增加或减少
       setFavoriteCount((prevCount) => (isBookmarked ? prevCount - 1 : prevCount + 1));
     } catch (error) {
@@ -99,8 +110,8 @@ const PostDetail: React.FC = () => {
       setBookmarkError('Failed to update bookmark status');
     }
   };
-  
-  
+
+
   const handleAuthorClick = () => {
     navigate(`/user-profile/${post?.author_id}`);
   };
@@ -163,7 +174,7 @@ const PostDetail: React.FC = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Post Metadata */}
       <div className="flex justify-between items-center mb-4">
         <div className="text-sm text-gray-600">
@@ -172,12 +183,12 @@ const PostDetail: React.FC = () => {
         </div>
         <div className="text-sm text-gray-500">Posted on {post.created_at}</div>
       </div>
-  
+
       {/* Post Content */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <p className="text-base leading-relaxed">{post.content}</p>
       </div>
-  
+
       {/* Interaction Buttons */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex">
@@ -191,7 +202,7 @@ const PostDetail: React.FC = () => {
             {/* <span className="ml-1">{isLiked ? 'Liked' : 'Like'}</span> */}
             <span className="ml-2 text-gray-600">{likeCount}</span> {/* 显示点赞数 */}
           </button>
-  
+
           {/* 收藏按钮 */}
           <button className="flex items-center mr-4" onClick={handleBookmark}>
             {isBookmarked ? (
@@ -202,21 +213,21 @@ const PostDetail: React.FC = () => {
             {/* <span className="ml-1">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span> */}
             <span className="ml-2 text-gray-600">{favoriteCount}</span> {/* 显示收藏数 */}
           </button>
-  
+
           {/* 分享按钮 */}
           <button className="flex items-center mr-4">
             <IconShare size={24} className="text-blue-500" />
             <span className="ml-1">Share</span>
           </button>
         </div>
-  
+
         {/* 评论按钮 */}
         <button className="flex items-center text-gray-500">
           <IconMessage2 size={24} />
           <span className="ml-1">Comment</span>
         </button>
       </div>
-  
+
       {/* Comments Section */}
       <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-6">
         <h3 className="text-lg font-semibold mb-4">Comments</h3>
@@ -224,7 +235,7 @@ const PostDetail: React.FC = () => {
       </div>
     </div>
   );
-  
+
 };
 
 export default PostDetail;

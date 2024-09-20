@@ -59,6 +59,14 @@ const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
     }
   }
 
+  const handleHistoryClick = async () => {
+    try {
+      navigate("/history");
+    } catch (error) {
+      console.error('Failed to fetch user history list:', error);
+    }
+  }
+
   return (
     <div className="w-60 h-screen bg-gray-100 shadow-lg flex flex-col fixed top-0 left-0">
       {/* 用户信息 */}
@@ -99,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
           </button>
         </li>
         <li className="hover:bg-gray-200">
-          <button className="flex items-center p-4 w-full text-left">
+          <button className="flex items-center p-4 w-full text-left" onClick={handleHistoryClick}>
             <IconHistory className="mr-3 text-gray-600" />
             <span className="text-gray-800">历史</span>
           </button>
