@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../component/TopNavigationBar';
 import Instance from '../interceptors/auth_interceptor';
-import ListItem from '../component/ListItem'; // 引入 ListItem 组件
-import { ListPostVo } from '../types/PostModel';
+import { ListPostVo } from "../types/PostModel";
 
 const BrowsingHistoryPage: React.FC = () => {
+  const instance = Instance();
+  const navigate = useNavigate();
   const [history, setHistory] = useState<ListPostVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const instance = Instance();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -31,48 +31,43 @@ const BrowsingHistoryPage: React.FC = () => {
     navigate(`/posts/${postId}`);
   };
 
-  const handleDelete = async (postId: number) => {
-    try {
-      await instance.delete(`/api/1/history/${postId}`);
-      setHistory(history.filter(item => item.id !== postId));
-    } catch (error) {
-      console.error('Failed to delete history item:', error);
-    }
-  };
-
   return (
-    <div className="container mx-auto mt-8 p-4">
-      <h1 className="text-3xl font-bold mb-4">浏览历史</h1>
-      {loading ? (
-        <div className="text-lg font-semibold">Loading...</div>
-      ) : error ? (
-        <div className="text-red-500">{error}</div>
-      ) : (
-        <div className="space-y-4">
-          {history.map(item => (
-            <div key={item.id} className="flex justify-between items-center">
-              <ListItem
-                id={item.id}
-                title={item.title}
-                content={item.content}
-                cover_image={item.cover_image}
-                interactive_info={item.interactive_info}
-                author_id={item.author_id}
-                author_name={item.author_name}
-                onPostClick={handlePostClick}
-                onAuthorClick={() => {} /* 不需要作者点击的功能 */}
-                onLikeClick={() => {} /* 不需要点赞功能 */}
-              />
-              <button
-                className="text-red-500 hover:text-red-600 ml-4"
-                onClick={() => handleDelete(item.id)}
+    <div className="flex flex-col h-screen">
+      <Navbar />
+      <main className="flex-grow p-6">
+        <h1 className="text-2xl font-semibold mb-4">浏览历史</h1>
+        {loading ? (
+          <div className="text-lg font-semibold">加载中...</div>
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          <div className="space-y-4">
+            {history.map(item => (
+              <div
+                key={item.id}
+                className="bg-white shadow-md rounded-lg p-4 flex space-x-4 cursor-pointer"
+                onClick={() => handlePostClick(item.id)}
               >
-                删除
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+                <div className="flex-none w-40 h-24 relative">
+                  <img
+                    src={item.cover_image || '/default-cover.jpg'}
+                    alt={item.title}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-medium mb-2">{item.title}</h2>
+                  <p className="text-gray-700 mb-2 line-clamp-2">{item.content}</p>
+                  <div className="flex items-center text-sm text-gray-500 space-x-4">
+                    <span>作者：{item.author_name}</span>
+                    {/* <span>浏览时间：{new Date(item.vi).toLocaleString()}</span> */}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
 };

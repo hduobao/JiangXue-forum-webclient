@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../component/SideBar'; // 引入 Sidebar 组件
+import Sidebar from '../component/SideBar';
 import PostList from '../component/PostList';
 import Navbar from '../component/TopNavigationBar';
 import Instance from '../interceptors/auth_interceptor';
+import { ListPostVo } from "../types/PostModel";
 
 const HomePage: React.FC = () => {
   const instance = Instance();
@@ -27,25 +28,26 @@ const HomePage: React.FC = () => {
     fetchUserInfo();
   }, []);
 
+  const fetchPosts = async (): Promise<ListPostVo[]> => {
+    const offset = 1;
+    const limit = 10;
+    const response = await instance.get(`/api/1/posts`, {
+      params: { offset, limit },
+    });
+    return response.data.data;
+  };
+
   return (
     <div className="flex h-screen">
-      {/* 左侧导航栏 */}
       <Sidebar avatar={userInfo.avatar} username={userInfo.username} />
-  
-      {/* 主内容区域 */}
-      <main className="flex-grow p-0 ml-60">  {/* 添加了 ml-60 确保主内容区域避开侧边栏 */}
-        {/* 顶部导航栏 */}
+      <main className="flex-grow p-0 ml-60">
         <Navbar />
-        
-        {/* PostList 组件，用于展示帖子 */}
         <div className="p-6">
-          <PostList />
+          <PostList fetchPosts={fetchPosts} />
         </div>
       </main>
     </div>
   );
-  
-  
 };
 
 export default HomePage;
