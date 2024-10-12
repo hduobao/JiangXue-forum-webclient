@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen py-8">
+    <div className="flex items-center justify-center min-h-screen py-8 bg-gradient-to-r from-blue-400 to-blue-600">
       <div className="flex flex-col items-center w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold">登录</h1>
         <form className="w-full mt-4" onSubmit={handleSubmit}>

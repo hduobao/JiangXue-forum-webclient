@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../component/SideBar';
+import LeftSidebar from '../component/LeftSideBar';
+import RightSidebar from '../component/RightSideBar';
 import PostList from '../component/PostList';
 import Navbar from '../component/TopNavigationBar';
 import Instance from '../interceptors/auth_interceptor';
@@ -39,13 +40,21 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex h-screen">
-      <Sidebar avatar={userInfo.avatar} username={userInfo.username} />
-      <main className="flex-grow p-0 ml-60">
-        <Navbar />
-        <div className="p-6">
-          <PostList fetchPosts={fetchPosts} />
-        </div>
-      </main>
+      {/* 左侧导航栏 */}
+      <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
+
+      {/* 中间主要内容和右侧栏包裹在一个 div 中 */}
+      <div className="flex flex-grow">
+        {/* 中间主要内容 */}
+        <main className="flex-grow bg-gray-100 p-6 ml-60 mr-20">
+          <Navbar />
+          <div className="p-6">
+            <PostList fetchPosts={fetchPosts} />
+          </div>
+        </main>
+      </div>
+      {/* 右侧推荐栏 */}
+      <RightSidebar /> {/* 右侧栏组件 */}
     </div>
   );
 };
