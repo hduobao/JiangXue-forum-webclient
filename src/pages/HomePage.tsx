@@ -10,6 +10,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({ avatar: '', username: '' });
 
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -28,16 +29,18 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
+    // <div>
+    //   Hello World!
+    // </div>
     <div className="flex justify-center bg-gray-100">
-      {/* 设置页面最大宽度 */}
       <div className="w-full max-w-[1200px] flex relative">
-        {/* 左侧导航栏 */}
-        <div className="w-[15vw] relative"> {/* 将宽度从 20vw 改为 15vw */}
+      
+        <div className="w-[15vw] absolute inset-y-0 left-0">
           <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
         </div>
 
-        {/* 中间内容 */}
-        <div className="flex-grow ml-4"> {/* 自动扩展中间内容区域 */}
+      
+        <div className="flex-grow ml-4 overflow-y-scoll"> 
           <main className="flex justify-center mt-4">
             <PostList />
           </main>

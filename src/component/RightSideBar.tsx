@@ -1,55 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LeftSidebar from '../component/LeftSideBar';
-import RightSidebar from '../component/RightSideBar';
-import Instance from '../interceptors/auth_interceptor';
-import PostList from '../component/PostList';
+import React from 'react';
+import { IconSearch } from '@tabler/icons-react'; // 引入 Tabler 的搜索图标
+import { RightSidebarProps } from '../types/UserModel';
 
-const HomePage: React.FC = () => {
-  const instance = Instance();
-  const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState({ avatar: '', username: '' });
+const RightSidebar: React.FC<RightSidebarProps> = () => {
+  const trendingTopics = [
+    { topic: "#ReactJS", tweets: "23.5K" },
+    { topic: "#TypeScript", tweets: "12.1K" },
+    { topic: "#JavaScript", tweets: "45.8K" },
+    { topic: "#CSS", tweets: "18.3K" },
+  ];
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await instance.get("/api/me/home");
-        setUserInfo({
-          avatar: response.data.data.avatar,
-          username: response.data.data.username,
-        });
-      } catch (error) {
-        console.error('Failed to fetch user info:', error);
-        navigate('/home');
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
+  const recommendedUsers = [
+    { username: "FrontendDev", handle: "@frontenddev" },
+    { username: "JS Guru", handle: "@jsguru" },
+    { username: "React Master", handle: "@reactmaster" },
+  ];
 
   return (
-    <div className="flex justify-center bg-gray-100">
-      {/* 设置页面最大宽度 */}
-      <div className="w-full max-w-[1200px] flex relative">
-        {/* 左侧导航栏 */}
-        <div className="w-[15vw] fixed top-0 left-0 h-screen overflow-y-auto"> {/* 设置为 fixed */}
-          <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
+    <div className="w-[15vw] h-screen bg-gray-50 text-gray-800 p-6 relative">
+      {/* 搜索框 */}
+      <div className="mb-6">
+        <div className="relative text-gray-600">
+          <input
+            type="search"
+            name="search"
+            placeholder="搜索 Twitter"
+            className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full shadow-sm"
+          />
+          <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
+            <IconSearch />
+          </button>
         </div>
+      </div>
 
-        {/* 中间内容 */}
-        <div className="flex-grow ml-[15vw]"> {/* 确保中间内容区域不会被左侧栏遮挡 */}
-          <main className="flex justify-center mt-4">
-            <PostList />
-          </main>
-        </div>
+      {/* 趋势话题 */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <h2 className="text-lg font-bold mb-3">趋势话题</h2>
+        <ul>
+          {trendingTopics.map((topic, index) => (
+            <li key={index} className="mb-4">
+              <div className="flex justify-between">
+                <div>
+                  <p className="font-medium">{topic.topic}</p>
+                  <p className="text-sm text-gray-500">{topic.tweets} Tweets</p>
+                </div>
+                <button className="text-blue-500 text-sm">关注</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <button className="text-blue-500 text-sm">查看更多</button>
+      </div>
 
-        {/* 右侧导航栏 */}
-        <div className="w-[15vw] fixed top-0 right-0 h-screen overflow-y-auto"> {/* 同样设置为 fixed */}
-          <RightSidebar />
-        </div>
+      {/* 你可能感兴趣的人 */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <h2 className="text-lg font-bold mb-3">你可能感兴趣的人</h2>
+        <ul>
+          {recommendedUsers.map((user, index) => (
+            <li key={index} className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-medium">{user.username}</p>
+                <p className="text-sm text-gray-500">{user.handle}</p>
+              </div>
+              <button className="bg-blue-500 text-white text-sm py-1 px-4 rounded-full">
+                关注
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button className="text-blue-500 text-sm">查看更多</button>
+      </div>
+
+      {/* 版权信息 */}
+      <div className="text-gray-400 text-xs">
+        <p>© 2024 Twitter, Inc.</p>
       </div>
     </div>
   );
 };
 
-export default HomePage;
+export default RightSidebar;
