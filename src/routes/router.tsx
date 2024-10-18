@@ -10,6 +10,7 @@ import FollowsPage from '../pages/FollowsPage';
 import FansPage from '../pages/FansPage';
 import FavoritesPage from '../pages/FavoritesPage';
 import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
+import TestPage from '../pages/TestPage';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -26,6 +27,7 @@ const MainRoute = () => {
         <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
         <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
+        <Route path="test" element={<TestPage/>} />
       </Route>
     )
   );

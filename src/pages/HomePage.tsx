@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftSidebar from '../component/LeftSideBar';
 import RightSidebar from '../component/RightSideBar';
-import PostList from '../component/PostList';
-import Navbar from '../component/TopNavigationBar';
 import Instance from '../interceptors/auth_interceptor';
-import { ListPostVo } from "../types/PostModel";
+import PostList from '../component/PostList';
 
 const HomePage: React.FC = () => {
   const instance = Instance();
@@ -29,32 +27,27 @@ const HomePage: React.FC = () => {
     fetchUserInfo();
   }, []);
 
-  const fetchPosts = async (): Promise<ListPostVo[]> => {
-    const offset = 1;
-    const limit = 10;
-    const response = await instance.get(`/api/1/posts`, {
-      params: { offset, limit },
-    });
-    return response.data.data;
-  };
-
   return (
-    <div className="flex h-screen">
-      {/* 左侧导航栏 */}
-      <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
+    <div className="flex justify-center bg-gray-100">
+      {/* 设置页面最大宽度 */}
+      <div className="w-full max-w-[1200px] flex relative">
+        {/* 左侧导航栏 */}
+        <div className="w-[15vw] relative"> {/* 将宽度从 20vw 改为 15vw */}
+          <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
+        </div>
 
-      {/* 中间主要内容和右侧栏包裹在一个 div 中 */}
-      <div className="flex flex-grow">
-        {/* 中间主要内容 */}
-        <main className="flex-grow bg-gray-100 p-6 ml-60 mr-20">
-          <Navbar />
-          <div className="p-6">
-            <PostList fetchPosts={fetchPosts} />
-          </div>
-        </main>
+        {/* 中间内容 */}
+        <div className="flex-grow ml-4"> {/* 自动扩展中间内容区域 */}
+          <main className="flex justify-center mt-4">
+            <PostList />
+          </main>
+        </div>
+
+        {/* 右侧导航栏 */}
+        <div className="w-[15vw] relative"> {/* 同样将右侧栏宽度从 20vw 改为 15vw */}
+          <RightSidebar />
+        </div>
       </div>
-      {/* 右侧推荐栏 */}
-      <RightSidebar /> {/* 右侧栏组件 */}
     </div>
   );
 };

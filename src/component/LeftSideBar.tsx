@@ -29,7 +29,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
   ];
 
   return (
-    <div className="w-64 h-screen bg-gradient-to-b from-blue-400 to-blue-500 text-gray-100 shadow-lg flex flex-col fixed top-0 left-0">
+    <div className="w-[15vw] h-screen bg-gradient-to-b from-blue-400 to-blue-500 text-gray-100 shadow-lg flex flex-col relative">
       {/* 用户信息 */}
       <div
         className="flex flex-col items-center mt-8 mb-4 cursor-pointer p-4 hover:bg-blue-500 rounded-lg transition-all"

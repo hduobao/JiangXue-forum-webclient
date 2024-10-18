@@ -1,10 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+// tailwind.config.js
+module.exports = {
+  mode: 'jit',
   content: [
-    "./src/**/*.{html,js,ts,jsx,tsx}", // 包含你的源代码文件
+    "./src/**/*.{html,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
-}
+  plugins: [
+    require("@tailwindcss/line-clamp"),
+  ],
+};

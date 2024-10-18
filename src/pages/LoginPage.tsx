@@ -24,8 +24,8 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const account = formData.get('account');
-    const password = formData.get('password');
+    const account = formData.get('account') as string;
+    const password = formData.get('password') as string;
 
     try {
       const response = await instance.post('/api/auth/login', {
@@ -45,7 +45,6 @@ const LoginPage: React.FC = () => {
       console.error('Login error:', error);
       alert('用户名或密码错误或服务器出现问题');
     }
-    console.log('Form submitted');
   };
 
   return (
@@ -78,6 +77,7 @@ const LoginPage: React.FC = () => {
                 </label>
                 <input
                   id="account"
+                  name="account" // 添加name属性
                   className="border p-3 shadow-md dark:bg-indigo-700 dark:text-gray-300 dark:border-gray-700 border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition transform hover:scale-105 duration-300"
                   type="text"
                   placeholder="Account"
@@ -90,6 +90,7 @@ const LoginPage: React.FC = () => {
                 </label>
                 <input
                   id="password"
+                  name="password" // 添加name属性
                   className="border p-3 shadow-md dark:bg-indigo-700 dark:text-gray-300 dark:border-gray-700 border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition transform hover:scale-105 duration-300"
                   type="password"
                   placeholder="Password"
@@ -115,8 +116,56 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
             <div id="third-party-auth" className="flex justify-center gap-4 mt-5">
-              {/* 第三方登录按钮代码省略 */}
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6"
+                  loading="lazy"
+                  src="https://ucarecdn.com/8f25a2ba-bdcf-4ff1-b596-088f330416ef/"
+                  alt="Google"
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6"
+                  loading="lazy"
+                  src="https://ucarecdn.com/95eebb9c-85cf-4d12-942f-3c40d7044dc6/"
+                  alt="LinkedIn"
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6 dark:invert"
+                  loading="lazy"
+                  src="https://ucarecdn.com/be5b0ffd-85e8-4639-83a6-5162dfa15a16/"
+                  alt="GitHub"
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6"
+                  loading="lazy"
+                  src="https://ucarecdn.com/6f56c0f1-c9c0-4d72-b44d-51a79ff38ea9/"
+                  alt="Facebook"
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6"
+                  loading="lazy"
+                  src="https://ucarecdn.com/82d7ca0a-c380-44c4-ba24-658723e2ab07/"
+                  alt="Twitter"
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
+                <img
+                  className="w-6 h-6"
+                  loading="lazy"
+                  src="https://ucarecdn.com/3277d952-8e21-4aad-a2b7-d484dad531fb/"
+                  alt="Apple"
+                />
+              </button>
             </div>
+
             <div className="mt-4 text-center text-sm text-gray-500">
               <p>
                 By signing in, you agree to our

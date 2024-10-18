@@ -70,3 +70,19 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+/* 在 global CSS 文件中添加以下内容 */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 3; /* 显示三行 */
+  line-clamp: 3; /* 现代浏览器支持 */
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 1; /* 显示一行 */
+  line-clamp: 1; /* 现代浏览器支持 */
+}
