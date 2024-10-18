@@ -26,7 +26,7 @@ const PostList: React.FC = () => {
   return (
     <div className="flex justify-center">
       {/* 设置中间推文流的最大宽度 */}
-      <div className="w-full max-w-2xl px-4">
+      <div className="w-full max-w-3xl px-4">
         {posts.map((post, index) => (
           <div key={index} className="w-full p-4 border-b border-gray-300">
             <div className="flex items-start space-x-4">
@@ -34,12 +34,12 @@ const PostList: React.FC = () => {
               <img
                 src={post.cover_image || "/static/images/avatar/1.jpg"}
                 alt="User Avatar"
-                className="w-12 h-12 rounded-full"
+                className="w-10 h-10 rounded-full object-cover"
               />
               {/* 帖子内容 */}
-              <div>
+              <div className="flex-1">
                 <div className="font-bold">{post.author_name}</div>
-                <div className="text-gray-600">{post.content}</div>
+                <div className="text-gray-600 line-clamp-3">{post.content}</div>
               </div>
             </div>
           </div>
@@ -47,6 +47,7 @@ const PostList: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default PostList;

@@ -10,7 +10,6 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({ avatar: '', username: '' });
 
-
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -29,29 +28,27 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    // <div>
-    //   Hello World!
-    // </div>
-    <div className="flex justify-center bg-gray-100">
-      <div className="w-full max-w-[1200px] flex relative">
-      
-        <div className="w-[15vw] absolute inset-y-0 left-0">
-          <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
-        </div>
-
-      
-        <div className="flex-grow ml-4 overflow-y-scoll"> 
-          <main className="flex justify-center mt-4">
-            <PostList />
-          </main>
-        </div>
-
-        {/* 右侧导航栏 */}
-        <div className="w-[15vw] relative"> {/* 同样将右侧栏宽度从 20vw 改为 15vw */}
-          <RightSidebar />
-        </div>
-      </div>
+<div className="flex justify-center bg-gray-100">
+  <div className="w-full max-w-[1200px] flex relative">
+    {/* 左侧边栏固定 */}
+    <div className="w-[18vw] h-screen fixed top-0 left-24">
+      <LeftSidebar avatar={userInfo.avatar} username={userInfo.username} />
     </div>
+
+    {/* 中间内容，添加 padding-right 避免覆盖 */}
+    <div className="flex-grow overflow-y-auto h-screen pl-[15vw] pr-[24vw]">
+      <main className="flex justify-center mt-4">
+        <PostList />
+      </main>
+    </div>
+
+    {/* 右侧导航栏固定 */}
+    <div className="w-[24vw] h-screen fixed top-0 right-24">
+      <RightSidebar />
+    </div>
+  </div>
+</div>
+
   );
 };
 
