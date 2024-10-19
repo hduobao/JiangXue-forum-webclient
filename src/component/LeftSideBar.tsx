@@ -33,9 +33,9 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
 
   return (
     <div className="h-screen bg-white text-gray-800 flex flex-col relative">
-      <ul className="flex-grow mt-6">
+      <ul className="flex-grow mt-0">
         {menuItems.map((item, index) => (
-          <li key={index} className={`rounded-lg transition-colors duration-200 ${location.pathname === item.route ? 'bg-blue-500 text-white' : 'hover:bg-blue-500 hover:text-white'}`}>
+          <li key={index} className={`rounded-lg transition-colors duration-200 ${location.pathname === item.route ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`}>
             <button
               className="flex items-center p-4 w-full text-left transition-all duration-200 ease-in-out"
               onClick={() => navigate(item.route)}

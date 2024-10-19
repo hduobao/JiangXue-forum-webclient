@@ -1,6 +1,5 @@
 import { Route, createBrowserRouter, createRoutesFromElements, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
-import PostDetailPage from '../pages/PostDetailPage';
 import App from '../App';
 import HomePage from '../pages/HomePage';
 import ProtectedRoute from './ProtectedRoute';
@@ -11,6 +10,7 @@ import FansPage from '../pages/FansPage';
 import FavoritesPage from '../pages/FavoritesPage';
 import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
 import TestPage from '../pages/TestPage';
+import TweetDetailPage from '../pages/TweetDetailPage';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -18,7 +18,7 @@ const MainRoute = () => {
       <Route path="/" element={<App />}>
         <Route path="login" element={<LoginPage />} />
         <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
-        <Route path="tweet/:postID" element={<ProtectedRoute element={<PostDetailPage />} />} />
+        <Route path="tweet/:postID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
         <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route path="message" element={<ProtectedRoute element={<MessageCenterPage />} />} />
@@ -27,7 +27,7 @@ const MainRoute = () => {
         <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
         <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
         <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
-        <Route path="test" element={<TestPage/>} />
+        <Route path="test" element={<TestPage />} />
       </Route>
     )
   );

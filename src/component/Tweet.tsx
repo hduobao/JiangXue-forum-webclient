@@ -2,9 +2,9 @@ import React from 'react';
 import { IconMessageCircle, IconRepeat, IconHeart, IconShare } from '@tabler/icons-react'; // 引入 Tabler Icons 用作操作按钮
 import { ListPostVo } from "../types/PostModel";
 
-const Tweet: React.FC<{ post: ListPostVo }> = ({ post }) => {
+const Tweet: React.FC<{ post: ListPostVo; onClick: () => void }> = ({ post, onClick }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+    <div className="bg-white shadow-md rounded-lg p-4 mb-6 cursor-pointer" onClick={onClick}>
       <div className="flex items-start">
         {/* 用户头像 */}
         <div className="flex-shrink-0">
