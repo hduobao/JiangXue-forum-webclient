@@ -18,7 +18,7 @@ const MainRoute = () => {
       <Route path="/" element={<App />}>
         <Route path="login" element={<LoginPage />} />
         <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
-        <Route path="posts/:postID" element={<ProtectedRoute element={<PostDetailPage />} />} />
+        <Route path="tweet/:postID" element={<ProtectedRoute element={<PostDetailPage />} />} />
         <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserProfile />} />} />
         <Route path="message" element={<ProtectedRoute element={<MessageCenterPage />} />} />

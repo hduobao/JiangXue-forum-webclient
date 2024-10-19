@@ -86,3 +86,25 @@ button:focus-visible {
   -webkit-line-clamp: 1; /* 显示一行 */
   line-clamp: 1; /* 现代浏览器支持 */
 }
+
+.line-clamp-10 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 10;
+  line-clamp: 1;
+}
+
+@layer utilities {
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .card {
+    perspective: 1000px; /* 设置透视效果 */
+  }
+}

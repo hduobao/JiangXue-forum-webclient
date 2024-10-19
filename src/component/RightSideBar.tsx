@@ -17,7 +17,7 @@ const RightSidebar: React.FC<RightSidebarProps> = () => {
   ];
 
   return (
-    <div className="w-[24vw] h-screen bg-gray-50 text-gray-800 p-6 relative">
+    <div className="h-screen bg-gray-50 text-gray-800 p-6 relative">
       {/* 搜索框 */}
       <div className="mb-6">
         <div className="relative text-gray-600">

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from "../types/PostModel";
+import Tweet from './Tweet'; // 导入 Tweet 组件
 
-const PostList: React.FC = () => {
+const TweetFeed: React.FC = () => {
   const instance = Instance();
   const [posts, setPosts] = useState<ListPostVo[]>([]);
 
@@ -25,29 +26,13 @@ const PostList: React.FC = () => {
 
   return (
     <div className="flex justify-center">
-      {/* 设置中间推文流的最大宽度 */}
       <div className="w-full max-w-3xl px-4">
         {posts.map((post, index) => (
-          <div key={index} className="w-full p-4 border-b border-gray-300">
-            <div className="flex items-start space-x-4">
-              {/* 用户头像 */}
-              <img
-                src={post.cover_image || "/static/images/avatar/1.jpg"}
-                alt="User Avatar"
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              {/* 帖子内容 */}
-              <div className="flex-1">
-                <div className="font-bold">{post.author_name}</div>
-                <div className="text-gray-600 line-clamp-3">{post.content}</div>
-              </div>
-            </div>
-          </div>
+          <Tweet key={index} post={post} /> // 使用 Tweet 组件
         ))}
       </div>
     </div>
   );
-
 };
 
-export default PostList;
+export default TweetFeed;

@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { IconMessageCircle, IconRepeat, IconHeart, IconShare } from '@tabler/icons-react'; // 引入 Tabler Icons 用作操作按钮
 import { ListPostVo } from "../types/PostModel";
-import Instance from '../interceptors/auth_interceptor';
 
 const Tweet: React.FC<{ post: ListPostVo }> = ({ post }) => {
   return (
     <div className="bg-white shadow-md rounded-lg p-4 mb-6">
       <div className="flex items-start">
         {/* 用户头像 */}
-        <img
-          src={post.cover_image || "/static/images/avatar/1.jpg"}
-          alt="User Avatar"
-          className="w-12 h-12 rounded-full object-cover mr-4"
-        />
-        <div className="flex-grow">
+        <div className="flex-shrink-0">
+          <img
+            src={post.cover_image || "/static/images/avatar/1.jpg"}
+            alt="User Avatar"
+            className="w-12 h-12 rounded-full object-cover"
+            style={{ width: '48px', height: '48px' }} // 固定宽高为 48x48 px，保持圆形
+          />
+        </div>
+        <div className="flex-grow ml-4">
           {/* 用户名和推文内容 */}
           <div className="flex justify-between items-center">
             <div>
@@ -22,7 +24,7 @@ const Tweet: React.FC<{ post: ListPostVo }> = ({ post }) => {
             </div>
             <span className="text-gray-400 text-sm">{new Date(post.created_at).toLocaleTimeString()}</span>
           </div>
-          <p className="mt-2 text-gray-700">{post.content}</p>
+          <p className="mt-2 text-gray-700 tracking-widest line-clamp-10">{post.content}</p>
 
           {/* 操作按钮 */}
           <div className="flex justify-between mt-4 text-gray-500">
