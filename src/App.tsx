@@ -32,7 +32,7 @@ const App = () => {
       <div className="w-full max-w-[1500px] flex relative h-full">
         {/* 左侧边栏 */}
         <div className="w-[25%] md:w-[20%] lg:w-[18%] h-screen shadow-lg overflow-y-auto border-r border-gray-200">
-          <LeftSidebar avatar={''} username={''} />
+          <LeftSidebar avatar={`${userInfo.avatar}`} username={`${userInfo.username}`} />
         </div>
 
         {/* 中间内容 */}

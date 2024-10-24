@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import Instance from '../interceptors/auth_interceptor';
 import { useNavigate } from 'react-router-dom';
 import { setTokens } from '../storage/storage';
@@ -6,20 +6,6 @@ import { setTokens } from '../storage/storage';
 const LoginPage: React.FC = () => {
   const instance = Instance();
   const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement | null>(null); // 创建一个 ref 来访问 video 元素
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.play(); // 鼠标进入时播放视频
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause(); // 鼠标离开时暂停视频
-      videoRef.current.currentTime = 0; // 可选：将视频重置为起始位置
-    }
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,139 +34,80 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div
-      className="relative flex justify-center items-center h-screen w-full"
-      onMouseEnter={handleMouseEnter} // 添加鼠标进入事件
-      onMouseLeave={handleMouseLeave} // 添加鼠标离开事件
-    >
-      <video
-        ref={videoRef} // 将 ref 赋给 video 元素
+    <div className="relative flex justify-center items-center h-screen w-full">
+      <img
         className="absolute top-0 left-0 w-full h-full object-cover"
-        src="login_bg.mp4" // 替换为你的视频文件路径
-        autoPlay
-        muted
-        loop
+        src="/login_bg.svg" // 背景图片
+        alt="Background"
       />
-      <div className="grid gap-8 relative z-10">
-        <section
-          id="back-div"
-          className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl"
-        >
-          <div className="border-8 border-transparent rounded-xl bg-white dark:bg-gray-900 shadow-xl p-8 m-2">
-            <h1 className="text-5xl font-bold text-center cursor-default dark:text-gray-300 text-gray-900">
-              Log in
-            </h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="account" className="block mb-2 text-lg dark:text-gray-300">
-                  Account
-                </label>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 relative z-10">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm bg-white rounded-xl shadow-lg p-8">
+          <img
+            alt="Your Company"
+            src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
+            className="mx-auto h-10 w-auto"
+          />
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Sign in to your account
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="account" className="block text-sm font-medium leading-6 text-gray-900">
+                Account
+              </label>
+              <div className="mt-2">
                 <input
                   id="account"
-                  name="account" // 添加name属性
-                  className="border p-3 shadow-md dark:bg-indigo-700 dark:text-gray-300 dark:border-gray-700 border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition transform hover:scale-105 duration-300"
+                  name="account"
                   type="text"
-                  placeholder="Account"
                   required
+                  autoComplete="username"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-lg dark:text-gray-300">
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                   Password
                 </label>
+                <div className="text-sm">
+                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
+              <div className="mt-2">
                 <input
                   id="password"
-                  name="password" // 添加name属性
-                  className="border p-3 shadow-md dark:bg-indigo-700 dark:text-gray-300 dark:border-gray-700 border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition transform hover:scale-105 duration-300"
+                  name="password"
                   type="password"
-                  placeholder="Password"
                   required
+                  autoComplete="current-password"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              <a href="#" className="text-blue-400 text-sm transition hover:underline">
-                Forget your password?
-              </a>
+            </div>
+
+            <div>
               <button
-                className="w-full p-3 mt-4 text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="submit"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 LOG IN
               </button>
-            </form>
-            <div className="flex flex-col mt-4 text-sm text-center dark:text-gray-300">
-              <p>
-                Don't have an account?
-                <a href="#" className="text-blue-400 transition hover:underline">
-                  Sign Up
-                </a>
-              </p>
             </div>
-            <div id="third-party-auth" className="flex justify-center gap-4 mt-5">
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6"
-                  loading="lazy"
-                  src="https://ucarecdn.com/8f25a2ba-bdcf-4ff1-b596-088f330416ef/"
-                  alt="Google"
-                />
-              </button>
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6"
-                  loading="lazy"
-                  src="https://ucarecdn.com/95eebb9c-85cf-4d12-942f-3c40d7044dc6/"
-                  alt="LinkedIn"
-                />
-              </button>
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6 dark:invert"
-                  loading="lazy"
-                  src="https://ucarecdn.com/be5b0ffd-85e8-4639-83a6-5162dfa15a16/"
-                  alt="GitHub"
-                />
-              </button>
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6"
-                  loading="lazy"
-                  src="https://ucarecdn.com/6f56c0f1-c9c0-4d72-b44d-51a79ff38ea9/"
-                  alt="Facebook"
-                />
-              </button>
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6"
-                  loading="lazy"
-                  src="https://ucarecdn.com/82d7ca0a-c380-44c4-ba24-658723e2ab07/"
-                  alt="Twitter"
-                />
-              </button>
-              <button className="p-2 rounded-lg hover:scale-105 transition transform duration-300 shadow-lg">
-                <img
-                  className="w-6 h-6"
-                  loading="lazy"
-                  src="https://ucarecdn.com/3277d952-8e21-4aad-a2b7-d484dad531fb/"
-                  alt="Apple"
-                />
-              </button>
-            </div>
+          </form>
 
-            <div className="mt-4 text-center text-sm text-gray-500">
-              <p>
-                By signing in, you agree to our
-                <a href="#" className="text-blue-400 transition hover:underline">
-                  Terms
-                </a>
-                and
-                <a href="#" className="text-blue-400 transition hover:underline">
-                  Privacy Policy
-                </a>
-                .
-              </p>
-            </div>
-          </div>
-        </section>
+          <p className="mt-10 text-center text-sm text-gray-500">
+            Don't have an account?{' '}
+            <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+              Sign Up
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

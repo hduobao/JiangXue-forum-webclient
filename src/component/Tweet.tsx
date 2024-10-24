@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconMessageCircle, IconRepeat, IconHeart, IconShare } from '@tabler/icons-react'; // 引入 Tabler Icons 用作操作按钮
+import { IconMessageCircle, IconRepeat, IconHeart, IconEye } from '@tabler/icons-react'; // 引入 Tabler Icons 用作操作按钮
 import { ListPostVo } from "../types/PostModel";
 
 const Tweet: React.FC<{ post: ListPostVo; onClick: () => void }> = ({ post, onClick }) => {
@@ -9,7 +9,7 @@ const Tweet: React.FC<{ post: ListPostVo; onClick: () => void }> = ({ post, onCl
         {/* 用户头像 */}
         <div className="flex-shrink-0">
           <img
-            src={post.cover_image || "/static/images/avatar/1.jpg"}
+            src={post.author_avatar || "/static/images/avatar/1.jpg"}
             alt="User Avatar"
             className="w-12 h-12 rounded-full object-cover"
             style={{ width: '48px', height: '48px' }} // 固定宽高为 48x48 px，保持圆形
@@ -41,8 +41,8 @@ const Tweet: React.FC<{ post: ListPostVo; onClick: () => void }> = ({ post, onCl
               <span>喜欢</span>
             </button>
             <button className="flex items-center space-x-2 hover:text-blue-500">
-              <IconShare />
-              <span>分享</span>
+              <IconEye />
+              <span>浏览</span>
             </button>
           </div>
         </div>

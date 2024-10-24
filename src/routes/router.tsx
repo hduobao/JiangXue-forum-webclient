@@ -15,24 +15,26 @@ import TweetDetailPage from '../pages/TweetDetailPage';
 const MainRoute = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<App />}>
+      <>
         <Route path="login" element={<LoginPage />} />
-        <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
-        <Route path="tweet/:postID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
-        <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
-        <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserProfile />} />} />
-        <Route path="message" element={<ProtectedRoute element={<MessageCenterPage />} />} />
-        <Route path="follows" element={<ProtectedRoute element={<FollowsPage />} />} />
-        <Route path="fans" element={<ProtectedRoute element={<FansPage />} />} />
-        <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
-        <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
-        <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
-        <Route path="test" element={<TestPage />} />
-      </Route>
+        <Route path="/" element={<App />}>
+          <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
+          <Route path="tweet/:postID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
+          <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
+          <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserProfile />} />} />
+          <Route path="message" element={<ProtectedRoute element={<MessageCenterPage />} />} />
+          <Route path="follows" element={<ProtectedRoute element={<FollowsPage />} />} />
+          <Route path="fans" element={<ProtectedRoute element={<FansPage />} />} />
+          <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
+          <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
+          <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
+          <Route path="test" element={<TestPage />} />
+        </Route>
+      </>
     )
   );
 
   return { router };
 };
 
-export default MainRoute;
+export default MainRoute; // 确保这里只有一个默认导出

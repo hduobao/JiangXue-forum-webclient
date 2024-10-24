@@ -14,6 +14,7 @@ export interface ListPostVo {
   title: string;
   content: string;
   author_id: number;        // 对应 Go 的 author_id
+  author_avatar: string;
   author_name: string;      // 对应 Go 的 author_name
   cover_image: string;      // 对应 Go 的 cover_image
   forum_id: number;         // 对应 Go 的 forum_id

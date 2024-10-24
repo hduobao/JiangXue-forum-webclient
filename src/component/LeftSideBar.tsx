@@ -3,17 +3,20 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { IconHome, IconMap, IconBell, IconMessageCircle, IconBookmark, IconUsers, IconUser, IconSwitchHorizontal } from '@tabler/icons-react';
 import { SidebarProps } from '../types/UserModel';
 import Instance from '../interceptors/auth_interceptor';
-import { removeTokens } from '../storage/storage';
+import { getAccessToken, getRefreshToken, removeTokens } from '../storage/storage';
 
 const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
   const instance = Instance();
   const navigate = useNavigate();
-  const location = useLocation(); // 获取当前路径
-  const [showLogout, setShowLogout] = useState(false);  // 控制显示退出按钮或头像区域
+  const location = useLocation();
+  const [showLogout, setShowLogout] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await instance.post('/api/auth/logout');
+      await instance.post('/api/auth/logout', {
+        accessToken : getAccessToken(),
+        refreshToken : getRefreshToken,
+      });
       removeTokens();
       navigate('/login');
     } catch (error) {
@@ -23,7 +26,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
 
   const menuItems = [
     { icon: <IconHome />, label: "首页", route: "/home" },
-    { icon: <IconMap />, label : "发现", route: "/explore"},
+    { icon: <IconMap />, label: "发现", route: "/explore" },
     { icon: <IconBell />, label: "通知", route: "/notifications" },
     { icon: <IconMessageCircle />, label: "消息", route: "/messages" },
     { icon: <IconBookmark />, label: "收藏", route: "/bookmarks" },
@@ -33,6 +36,12 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
 
   return (
     <div className="h-screen bg-white text-gray-800 flex flex-col relative">
+      <div className="flex items-center justify-between p-4">
+        <img src={`/favorite.svg`} alt="Company Logo" className="h-10" />
+        {/* <div className="text-2xl ml-0 leading-none">𝒮𝓃𝑜𝓌ℱ𝓁𝑜𝓌</div> */}
+        <img src={`/snowflow.svg`} alt="s" className='h-10' />
+      </div>
+
       <ul className="flex-grow mt-0">
         {menuItems.map((item, index) => (
           <li key={index} className={`rounded-lg transition-colors duration-200 ${location.pathname === item.route ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`}>
@@ -84,7 +93,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
         {/* 右侧区域：切换按钮 */}
         <div
           className="flex items-center p-2 hover:bg-blue-500 rounded-lg transition duration-200"
-          onClick={() => setShowLogout(!showLogout)}  // 切换 showLogout 状态
+          onClick={() => setShowLogout(!showLogout)}
         >
           <button
             className="flex items-center justify-center w-10 h-10 rounded-full"
