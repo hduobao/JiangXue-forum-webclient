@@ -3,7 +3,7 @@ import LoginPage from '../pages/LoginPage';
 import App from '../App';
 import HomePage from '../pages/HomePage';
 import ProtectedRoute from './ProtectedRoute';
-import UserProfile from '../pages/UserSpacePage';
+import UserSpacePage from '../pages/UserSpacePage';
 import MessageCenterPage from '../pages/MessageCenterPage';
 import FollowsPage from '../pages/FollowsPage';
 import FansPage from '../pages/FansPage';
@@ -11,6 +11,9 @@ import FavoritesPage from '../pages/FavoritesPage';
 import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
 import TestPage from '../pages/TestPage';
 import TweetDetailPage from '../pages/TweetDetailPage';
+import CommunityPage from '../pages/CommunityPage';
+import NotificationPage from '../pages/Notification';
+import ExplorePage from '../pages/ExplorePage';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -20,15 +23,17 @@ const MainRoute = () => {
         <Route path="/" element={<App />}>
           <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
           <Route path="tweet/:postID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
-          <Route path="user-profile" element={<ProtectedRoute element={<UserProfile />} />} />
-          <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserProfile />} />} />
-          <Route path="message" element={<ProtectedRoute element={<MessageCenterPage />} />} />
+          <Route path="user-profile" element={<ProtectedRoute element={<UserSpacePage />} />} />
+          <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserSpacePage />} />} />
+          <Route path="notifications" element={<ProtectedRoute element={<NotificationPage />} />} />
+          <Route path="explore" element={<ProtectedRoute element={<ExplorePage />} />} />
+          <Route path="messages" element={<ProtectedRoute element={<MessageCenterPage />} />} />
           <Route path="follows" element={<ProtectedRoute element={<FollowsPage />} />} />
           <Route path="fans" element={<ProtectedRoute element={<FansPage />} />} />
           <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
           <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
+          <Route path="communities" element={<ProtectedRoute element={<CommunityPage />} />} />
           <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
-          <Route path="test" element={<TestPage />} />
         </Route>
       </>
     )

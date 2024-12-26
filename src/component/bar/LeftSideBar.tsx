@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { IconHome, IconMap, IconBell, IconMessageCircle, IconBookmark, IconUsers, IconUser, IconSwitchHorizontal } from '@tabler/icons-react';
-import { SidebarProps } from '../types/UserModel';
-import Instance from '../interceptors/auth_interceptor';
-import { getAccessToken, getRefreshToken, removeTokens } from '../storage/storage';
+import { IconHome, IconMap, IconBell, IconMessageCircle, IconBookmark, IconUsers, IconUser, IconSwitchHorizontal, IconHistory } from '@tabler/icons-react';
+import { SidebarProps } from '../../types/UserModel';
+import Instance from '../../interceptors/auth_interceptor';
+import { getAccessToken, getRefreshToken, removeTokens } from '../../storage/storage';
 
 const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
   const instance = Instance();
@@ -29,9 +29,10 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
     { icon: <IconMap />, label: "发现", route: "/explore" },
     { icon: <IconBell />, label: "通知", route: "/notifications" },
     { icon: <IconMessageCircle />, label: "消息", route: "/messages" },
-    { icon: <IconBookmark />, label: "收藏", route: "/bookmarks" },
-    { icon: <IconUsers />, label: "联系人", route: "/lists" },
-    { icon: <IconUser />, label: "空间", route: "/profile" },
+    { icon: <IconHistory />, label: "历史", route: "/history"},
+    { icon: <IconBookmark />, label: "收藏", route: "/favorites" },
+    { icon: <IconUsers />, label: "社区", route: "/communities" },
+    { icon: <IconUser />, label: "空间", route: "/user-profile" },
   ];
 
   return (

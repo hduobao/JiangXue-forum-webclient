@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../component/TopBar';
+import TopBar from '../component/bar/TopBar';
 import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from "../types/PostModel";
+import Tweet from '../component/tweet/Tweet'; 
+import Loader from '../component/common/Loader';
 
 const BrowsingHistoryPage: React.FC = () => {
   const instance = Instance();
@@ -27,44 +29,28 @@ const BrowsingHistoryPage: React.FC = () => {
     fetchHistory();
   }, []);
 
-  const handlePostClick = (postId: number) => {
-    navigate(`/posts/${postId}`);
+  const handleTweetClick = (postID: number) => {
+    navigate(`/tweet/${postID.toString()}`); // 将 postID 转换为字符串
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <Navbar />
-      <main className="flex-grow p-6">
-        <h1 className="text-2xl font-semibold mb-4">浏览历史</h1>
+    <div className="flex-grow flex flex-col h-screen overflow-y-auto">
+      <div className="sticky top-0 z-10 bg-white shadow-md">
+        <TopBar page='浏览历史' />
+      </div>
+      <main className="flex-grow overflow-y-auto">
+        {/* <h1 className="text-2xl font-semibold mb-4">浏览历史</h1> */}
         {loading ? (
-          <div className="text-lg font-semibold">加载中...</div>
+          <Loader />
         ) : error ? (
           <div className="text-red-500">{error}</div>
         ) : (
-          <div className="space-y-4">
-            {history.map(item => (
-              <div
-                key={item.id}
-                className="bg-white shadow-md rounded-lg p-4 flex space-x-4 cursor-pointer"
-                onClick={() => handlePostClick(item.id)}
-              >
-                <div className="flex-none w-40 h-24 relative">
-                  <img
-                    src={item.cover_image || '/default-cover.jpg'}
-                    alt={item.title}
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-medium mb-2">{item.title}</h2>
-                  <p className="text-gray-700 mb-2 line-clamp-2">{item.content}</p>
-                  <div className="flex items-center text-sm text-gray-500 space-x-4">
-                    <span>作者：{item.author_name}</span>
-                    {/* <span>浏览时间：{new Date(item.vi).toLocaleString()}</span> */}
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center">
+            <div className="w-full max-w-3xl px-4 overflow-y-auto">
+              {history.map((tweet, index) => (
+                <Tweet key={index} post={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
+              ))}
+            </div>
           </div>
         )}
       </main>

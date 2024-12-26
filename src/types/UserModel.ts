@@ -3,6 +3,10 @@ export interface SidebarProps {
     username: string;
 }
 
+export interface RightSidebarProps {
+    
+}
+
 export interface UserBaseInfo {
     id: number;
     username: string;

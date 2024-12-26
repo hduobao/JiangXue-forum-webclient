@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { PostVo } from '../types/PostModel';
 import { IconThumbUp, IconThumbUpFilled, IconShare, IconMessage2, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react'; // 引入 IconBookmarkFilled
-import GetDeviceInfo from '../component/UseDeviceInfo';
+import GetDeviceInfo from '../component/common/UseDeviceInfo';
 
 const PostDetail: React.FC = () => {
   const instance = Instance();

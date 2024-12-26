@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconSearch } from '@tabler/icons-react'; // 引入 Tabler 的搜索图标
-import { RightSidebarProps } from '../types/UserModel';
+import { RightSidebarProps } from '../../types/UserModel';
 
 const RightSidebar: React.FC<RightSidebarProps> = () => {
   const trendingTopics = [

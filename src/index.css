@@ -95,6 +95,17 @@ button:focus-visible {
   line-clamp: 1;
 }
 
+/* Hides the scrollbar but still allows scrolling */
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-container {
+  -ms-overflow-style: none;  /* for Internet Explorer */
+  scrollbar-width: none;      /* for Firefox */
+}
+
+
 @layer utilities {
   .rotate-y-180 {
     transform: rotateY(180deg);

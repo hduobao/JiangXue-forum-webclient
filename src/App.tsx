@@ -2,8 +2,8 @@
 import { useNavigate } from 'react-router-dom';
 import Instance from './interceptors/auth_interceptor';
 import { Outlet } from 'react-router-dom';
-import LeftSidebar from './component/LeftSideBar';
-import RightSidebar from './component/RightSideBar';
+import LeftSidebar from './component/bar/LeftSideBar';
+import RightSidebar from './component/bar/RightSideBar';
 import { useEffect, useState } from 'react';
 
 const App = () => {
@@ -28,7 +28,7 @@ const App = () => {
     fetchUserInfo();
   }, []);
   return (
-    <div className="flex justify-center bg-gray-100 h-screen overflow-hidden">
+    <div className="flex justify-center bg-gray-100 h-screen overflow-y-scroll">
       <div className="w-full max-w-[1500px] flex relative h-full">
         {/* 左侧边栏 */}
         <div className="w-[25%] md:w-[20%] lg:w-[18%] h-screen shadow-lg overflow-y-auto border-r border-gray-200">
@@ -36,7 +36,7 @@ const App = () => {
         </div>
 
         {/* 中间内容 */}
-        <div className="flex-grow flex flex-col h-screen overflow-y-auto">
+        <div className="flex-grow flex flex-col h-screen">
           <main className="flex-grow overflow-y-auto">
             <Outlet /> {/* 渲染匹配的子路由 */}
           </main>
