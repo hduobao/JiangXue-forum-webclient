@@ -1,4 +1,3 @@
-// App.js
 import { useNavigate } from 'react-router-dom';
 import Instance from './interceptors/auth_interceptor';
 import { Outlet } from 'react-router-dom';
@@ -27,23 +26,24 @@ const App = () => {
 
     fetchUserInfo();
   }, []);
+
   return (
     <div className="flex justify-center bg-gray-100 h-screen overflow-y-scroll">
       <div className="w-full max-w-[1200px] flex relative h-full">
         {/* 左侧边栏 */}
-        <div className="w-[25%] md:w-[20%] lg:w-[30%] h-screen shadow-lg overflow-y-auto border-r border-gray-200">
+        <div className="w-[250px] h-screen shadow-lg overflow-y-auto border-r border-gray-200 flex-shrink-0">
           <LeftSidebar avatar={`${userInfo.avatar}`} username={`${userInfo.username}`} />
         </div>
 
         {/* 中间内容 */}
-        <div className="flex-grow flex flex-col h-screen">
-          <main className="flex-grow overflow-y-auto">
+        <div className="flex-grow flex flex-col h-screen overflow-y-auto">
+          <main className="flex-grow">
             <Outlet /> {/* 渲染匹配的子路由 */}
           </main>
         </div>
 
         {/* 右侧导航栏 */}
-        <div className="w-[24vw] h-screen shadow-lg overflow-y-auto">
+        <div className="w-[300px] h-screen shadow-lg overflow-y-auto flex-shrink-0">
           <RightSidebar />
         </div>
       </div>
