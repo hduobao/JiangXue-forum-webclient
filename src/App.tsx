@@ -29,9 +29,9 @@ const App = () => {
   }, []);
   return (
     <div className="flex justify-center bg-gray-100 h-screen overflow-y-scroll">
-      <div className="w-full max-w-[1500px] flex relative h-full">
+      <div className="w-full max-w-[1200px] flex relative h-full">
         {/* 左侧边栏 */}
-        <div className="w-[25%] md:w-[20%] lg:w-[18%] h-screen shadow-lg overflow-y-auto border-r border-gray-200">
+        <div className="w-[25%] md:w-[20%] lg:w-[30%] h-screen shadow-lg overflow-y-auto border-r border-gray-200">
           <LeftSidebar avatar={`${userInfo.avatar}`} username={`${userInfo.username}`} />
         </div>
 

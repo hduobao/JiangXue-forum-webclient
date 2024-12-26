@@ -67,7 +67,7 @@ const StyledWrapper = styled.div`
   .button::before {
     position: absolute;
     bottom: -20px;
-    content: "Back to Top";
+    content: "回到顶部";
     color: white;
     /* transition-duration: .3s; */
     font-size: 0px;

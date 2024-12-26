@@ -145,11 +145,13 @@ const TweetDetailPage: React.FC = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-2xl font-bold mb-2">{tweet?.title}</h2>
             <div className="flex items-center mb-4">
-              <img
-                src={tweet?.author_avatar || "/static/images/avatar/1.jpg"}
-                alt="User Avatar"
-                className="w-12 h-12 rounded-full object-cover mr-2"
-              />
+              <div className='flex-shrink-0 cursor-pointer' onClick={handleAuthorClick}>
+                <img
+                  src={tweet?.author_avatar || "/static/images/avatar/1.jpg"}
+                  alt="User Avatar"
+                  className="w-12 h-12 rounded-full object-cover mr-2"
+                />
+              </div>
               <div>
                 <span className="font-semibold text-gray-800">{tweet?.author_name}</span>
                 <span className="text-gray-500 text-sm ml-2">
