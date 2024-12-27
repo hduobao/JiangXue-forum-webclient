@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import EditProfileButton from '../button/EditProfileButton';
 
 const MyProfileButtonGroup = () => {
