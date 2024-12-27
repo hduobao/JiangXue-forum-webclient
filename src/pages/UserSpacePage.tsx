@@ -10,7 +10,6 @@ const UserProfile: React.FC = () => {
   const instance = Instance();
   const { authorID } = useParams<{ authorID?: string }>();
   const [userInfo, setUserInfo] = useState<UserBaseInfo | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -32,24 +31,16 @@ const UserProfile: React.FC = () => {
     fetchUserInfo();
   }, [authorID]);
 
-  const handleAvatarClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <div className="flex-grow flex flex-col h-screen overflow-y-auto">
       <div className="sticky top-0 z-10 bg-white shadow-md">
-        <TopBar page="空间" />
+        <TopBar page={userInfo?.username || "loading..."} />
       </div>
       <main className="flex-grow overflow-y-auto">
         {loading || userInfo === null ? (
           <Loader />
         ) : (
-          <UserSpaceInfoCard userInfo={userInfo} />
+          <UserSpaceInfoCard userInfo={userInfo} isOwnProfile={!authorID} />
         )}
       </main>
     </div>

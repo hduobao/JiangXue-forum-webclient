@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { ListPostVo } from '../types/PostModel';
-import { IconHeart } from '@tabler/icons-react';
 import TopBar from '../component/bar/TopBar';
 import Loader from '../component/common/Loader';
 import Tweet from '../component/tweet/Tweet';

@@ -9,7 +9,6 @@ import FollowsPage from '../pages/FollowsPage';
 import FansPage from '../pages/FansPage';
 import FavoritesPage from '../pages/FavoritesPage';
 import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
-import TestPage from '../pages/TestPage';
 import TweetDetailPage from '../pages/TweetDetailPage';
 import CommunityPage from '../pages/CommunityPage';
 import NotificationPage from '../pages/Notification';

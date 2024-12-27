@@ -1,5 +1,5 @@
 // HomePage.js
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import TweetFeed from '../component/tweet/TweetFeed';
 import TopBar from '../component/bar/TopBar';

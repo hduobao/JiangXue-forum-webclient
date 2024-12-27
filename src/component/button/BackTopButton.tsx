@@ -19,7 +19,7 @@ const BackTopButton: React.FC<BackTopButtonProps> = ({ onClick }) => {
 const StyledWrapper = styled.div`
   position: fixed;
   bottom: 20px;
-  left: 46.5%;
+  left: 48%;
   transform: translateX(-50%);
   z-index: 100;
   transition-duration: 0.3s;
