@@ -2,25 +2,31 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { IconSnowflake } from '@tabler/icons-react';
 
-const FollowButton = () => {
+interface FollowButtonProps {
+  onClick: () => void; // 父组件传入的点击事件
+  followStatus: boolean;
+}
+
+const FollowButton: React.FC<FollowButtonProps> = ({ onClick, followStatus }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <StyledWrapper>
+    <StyledWrapper followStatus={followStatus}>
       <button
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onClick={onClick} // 按钮点击时调用传入的事件
       >
-        <p>关注</p>
+        <p>{followStatus ? "取关" : "关注"}</p>
         {hovered ? (
           <IconSnowflake
             size={16}
-            color="#fff" // 设置悬浮时的图标颜色
+            color="#fff" // 悬浮时图标颜色
           />
         ) : (
           <IconSnowflake
             size={16}
-            color="#0077b5" // 设置默认状态下的图标颜色
+            color="#0077b5" // 默认状态下图标颜色
           />
         )}
       </button>
@@ -28,7 +34,11 @@ const FollowButton = () => {
   );
 }
 
-const StyledWrapper = styled.div`
+interface StyledWrapperProps {
+  followStatus: boolean;
+}
+
+const StyledWrapper = styled.div<StyledWrapperProps>`
   button {
     background-color: #fff;
     border: 1px solid #0077b5;
@@ -50,7 +60,7 @@ const StyledWrapper = styled.div`
     padding: 0;
     transition: 0.5s;
     color: #0077b5;
-    font-weight: bold; /* 让文本加粗 */
+    font-weight: bold;
   }
 
   button svg, button img {
@@ -75,7 +85,7 @@ const StyledWrapper = styled.div`
   }
 
   button:hover {
-    background-color: #0077b5;
+    background-color: ${({ followStatus }) => (followStatus ? 'rgb(200, 40, 45)' : '#0077b5')};
   }
 `;
 

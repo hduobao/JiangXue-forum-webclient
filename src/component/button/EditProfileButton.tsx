@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 
-const EditProfileButton = () => {
+interface EditProfileButtonProps {
+  onClick: () => void; // 父组件传入的点击事件
+}
+
+const EditProfileButton: React.FC<EditProfileButtonProps> = ({onClick}) => {
   return (
     <StyledWrapper>
       <div className="container-button">
@@ -10,7 +14,7 @@ const EditProfileButton = () => {
         <div className="hover bt-4" />
         <div className="hover bt-5" />
         <div className="hover bt-6" />
-        <button />
+        <button onClick={onClick} />
       </div>
     </StyledWrapper>
   );

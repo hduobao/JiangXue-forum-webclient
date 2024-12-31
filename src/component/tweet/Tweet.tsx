@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { IconMessageCircle, IconRepeat, IconHeart, IconEye, IconHeartFilled } from '@tabler/icons-react'; // 引入 Tabler Icons 用作操作按钮
 import { useNavigate } from 'react-router-dom'; // 导入 useNavigate
 import { ListPostVo } from "../../types/PostModel";
+import { getUserId } from '../../storage/storage';
 import Instance from '../../interceptors/auth_interceptor';
 
 const Tweet: React.FC<{ post: ListPostVo; onClick: () => void; }> = ({ post, onClick }) => {
+
+  const userId = getUserId();
 
   const instance = Instance();
   const navigate = useNavigate();
@@ -28,7 +31,11 @@ const Tweet: React.FC<{ post: ListPostVo; onClick: () => void; }> = ({ post, onC
   const handleAuthorClick = async (event : React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     if (!post) return;
-    navigate(`/user-profile/${post.author_id}`)
+    if (userId == post.author_id.toString()) {
+      navigate(`/user-profile`)
+    } else {
+      navigate(`/user-profile/${post.author_id}`)
+    }
   }
 
   return (

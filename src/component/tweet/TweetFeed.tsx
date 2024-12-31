@@ -35,7 +35,6 @@ const TweetFeed: React.FC = () => {
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      console.log("Scroll event fired:", scrollContainer.scrollTop);
       if (scrollContainer.scrollTop > 200) {
         setShowBackTopButton(true);
       } else {

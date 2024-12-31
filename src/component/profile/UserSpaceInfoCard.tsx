@@ -1,17 +1,24 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { UserBaseInfo } from "../../types/UserModel";
 import { IconBalloon, IconCalendarWeek } from "@tabler/icons-react";
 import OtherProfileButtonGroup from "./OtherProfileButtonGroup";
 import MyProfileButtonGroup from "./MyprofileButtonGroup";
+import { useNavigate } from "react-router-dom";
+import Instance from "../../interceptors/auth_interceptor";
+import { getUserId } from "../../storage/storage";
 
-const UserSpaceInfoCard: React.FC<{ userInfo: UserBaseInfo, isOwnProfile: boolean }> = ({
-  userInfo, isOwnProfile
-}) => {
+const UserSpaceInfoCard: React.FC<{
+  userInfo: UserBaseInfo;
+  isOwnProfile: boolean;
+}> = ({ userInfo, isOwnProfile }) => {
+  const userId = getUserId();
+  const instance = Instance();
+  const navigate = useNavigate();
   const [modalData, setModalData] = useState<{
     type: "avatar" | "bg" | null;
     src: string;
   } | null>(null);
+  const [followStatus, setFollowStatus] = useState<boolean>(false);
 
   const handleImageClick = (type: "avatar" | "bg", src: string) => {
     setModalData({ type, src });
@@ -27,7 +34,9 @@ const UserSpaceInfoCard: React.FC<{ userInfo: UserBaseInfo, isOwnProfile: boolea
     if (type === "birthday") {
       const month = date.getMonth() + 1; // getMonth() 返回的是 0-11，所以需要加 1
       const day = date.getDate();
-      return `${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+      return `${month.toString().padStart(2, "0")}-${day
+        .toString()
+        .padStart(2, "0")}`;
     }
 
     if (type === "createdAt") {
@@ -39,6 +48,41 @@ const UserSpaceInfoCard: React.FC<{ userInfo: UserBaseInfo, isOwnProfile: boolea
 
     return "";
   };
+
+  const handleSearchClick = () => {
+    navigate("/explore", { state: { account: userInfo.account } });
+  };
+
+  const handleFollowClick = async () => {
+    try {
+      await instance.post(`/api/me/follows/${userInfo.id}`);
+      setFollowStatus(!followStatus)
+    } catch (error) {
+      console.error("Failed to update follow status:", error);
+    }
+  };
+
+  const handleEditClick = () => {
+
+  }
+
+  useEffect(() => {
+    const fetchFollowStatus = async () => {
+      try {
+        const response = await instance.get(
+          `/api/me/follows/${userInfo.id}/status`
+        );
+        setFollowStatus(response.data.data)
+      } catch (error) {
+        console.error("Failed to fetch user info:", error);
+      } finally {
+      }
+    };
+
+    if (userInfo.id.toString() != userId) {
+      fetchFollowStatus();
+    }
+  }, []);
 
   return (
     <div className="w-full max-w-3xl px-4 overflow-y-scroll scroll-container">
@@ -68,7 +112,15 @@ const UserSpaceInfoCard: React.FC<{ userInfo: UserBaseInfo, isOwnProfile: boolea
               }
             />
           </div>
-          {isOwnProfile ? <MyProfileButtonGroup /> : <OtherProfileButtonGroup />}
+          {isOwnProfile ? (
+            <MyProfileButtonGroup handleEditClick={handleEditClick} />
+          ) : (
+            <OtherProfileButtonGroup
+              followStatus={followStatus}
+              handleSearchClick={handleSearchClick}
+              handleFollowClick={handleFollowClick}
+            />
+          )}
         </div>
 
         {/* 用户名和位置 */}

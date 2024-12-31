@@ -1,6 +1,6 @@
-import React from 'react';
-import { IconSearch } from '@tabler/icons-react'; // 引入 Tabler 的搜索图标
-import { RightSidebarProps } from '../../types/UserModel';
+import React from "react";
+import { RightSidebarProps } from "../../types/UserModel";
+import SearchForm from "../form/SearchForm";
 
 const RightSidebar: React.FC<RightSidebarProps> = () => {
   const trendingTopics = [
@@ -16,22 +16,17 @@ const RightSidebar: React.FC<RightSidebarProps> = () => {
     { username: "React Master", handle: "@reactmaster" },
   ];
 
+  const isExplorePage = location.pathname.includes("/explore");
+
   return (
-    <div className="h-screen bg-gray-50 text-gray-800 p-6 relative">
-      {/* 搜索框 */}
-      <div className="mb-6">
-        <div className="relative text-gray-600">
-          <input
-            type="search"
-            name="search"
-            placeholder="搜索 Twitter"
-            className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full shadow-sm"
-          />
-          <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
-            <IconSearch />
-          </button>
+    <div className="h-screen overflow-y-auto scroll-container bg-gray-50 text-gray-800 p-6 relative">
+      {isExplorePage ? (
+        <></>
+      ) : (
+        <div className="mb-6">
+          <SearchForm />
         </div>
-      </div>
+      )}
 
       {/* 趋势话题 */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">

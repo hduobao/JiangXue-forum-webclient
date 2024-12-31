@@ -12,7 +12,6 @@ const TweetDetailPage: React.FC = () => {
   const deviceInfo = GetDeviceInfo();
   const { postID } = useParams<{ postID: string }>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [, setFollowError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
@@ -119,19 +118,6 @@ const TweetDetailPage: React.FC = () => {
   const handleAuthorClick = () => {
     navigate(`/user-profile/${tweet?.author_id}`);
   };
-
-  const handleFollow = async () => {
-    if (!tweet) return;
-
-    try {
-      await instance.post(`/api/me/follows/${tweet.author_id}`);
-      setIsFollowing((prev) => !prev);
-    } catch (error) {
-      console.error('Failed to update follow status:', error);
-      setFollowError('Failed to update follow status');
-    }
-  };
-
 
   return (
     <div className="flex-grow flex flex-col h-screen overflow-y-auto">

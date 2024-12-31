@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import LeftSidebar from './component/bar/LeftSideBar';
 import RightSidebar from './component/bar/RightSideBar';
 import { useEffect, useState } from 'react';
+import { setUserId } from './storage/storage';
 
 const App = () => {
   const instance = Instance();
@@ -18,6 +19,9 @@ const App = () => {
           avatar: response.data.data.avatar,
           username: response.data.data.username,
         });
+        console.log("id=", response.data.data.id)
+        setUserId(response.data.data.id)
+        navigate('/home');
       } catch (error) {
         console.error('Failed to fetch user info:', error);
         navigate('/home');

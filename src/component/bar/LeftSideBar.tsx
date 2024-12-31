@@ -36,7 +36,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username }) => {
   ];
 
   return (
-    <div className="h-screen bg-white text-gray-800 flex flex-col relative">
+    <div className="h-screen bg-white text-gray-800 flex flex-col relative overflow-y-auto scroll-container">
       <div className="flex items-center justify-between p-4">
         <img src={`/favorite.svg`} alt="Company Logo" className="h-10" />
         {/* <div className="text-2xl ml-0 leading-none">𝒮𝓃𝑜𝓌ℱ𝓁𝑜𝓌</div> */}
