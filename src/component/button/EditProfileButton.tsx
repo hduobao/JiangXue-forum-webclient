@@ -6,7 +6,7 @@ interface EditProfileButtonProps {
 
 const EditProfileButton: React.FC<EditProfileButtonProps> = ({onClick}) => {
   return (
-    <StyledWrapper>
+    <StyledWrapper onClick={onClick}>
       <div className="container-button">
         <div className="hover bt-1" />
         <div className="hover bt-2" />
@@ -14,7 +14,7 @@ const EditProfileButton: React.FC<EditProfileButtonProps> = ({onClick}) => {
         <div className="hover bt-4" />
         <div className="hover bt-5" />
         <div className="hover bt-6" />
-        <button onClick={onClick} />
+        <button />
       </div>
     </StyledWrapper>
   );

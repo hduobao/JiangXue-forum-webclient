@@ -6,6 +6,7 @@ import MyProfileButtonGroup from "./MyprofileButtonGroup";
 import { useNavigate } from "react-router-dom";
 import Instance from "../../interceptors/auth_interceptor";
 import { getUserId } from "../../storage/storage";
+import EditProfileForm from "./EditProfileForm";
 
 const UserSpaceInfoCard: React.FC<{
   userInfo: UserBaseInfo;
@@ -19,6 +20,7 @@ const UserSpaceInfoCard: React.FC<{
     src: string;
   } | null>(null);
   const [followStatus, setFollowStatus] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 控制编辑弹窗显示状态
 
   const handleImageClick = (type: "avatar" | "bg", src: string) => {
     setModalData({ type, src });
@@ -56,15 +58,16 @@ const UserSpaceInfoCard: React.FC<{
   const handleFollowClick = async () => {
     try {
       await instance.post(`/api/me/follows/${userInfo.id}`);
-      setFollowStatus(!followStatus)
+      setFollowStatus(!followStatus);
     } catch (error) {
       console.error("Failed to update follow status:", error);
     }
   };
 
   const handleEditClick = () => {
-
-  }
+    console.log("点击编辑");
+    setIsEditModalOpen(true); // 打开编辑弹窗
+  };
 
   useEffect(() => {
     const fetchFollowStatus = async () => {
@@ -72,14 +75,13 @@ const UserSpaceInfoCard: React.FC<{
         const response = await instance.get(
           `/api/me/follows/${userInfo.id}/status`
         );
-        setFollowStatus(response.data.data)
+        setFollowStatus(response.data.data);
       } catch (error) {
         console.error("Failed to fetch user info:", error);
-      } finally {
       }
     };
 
-    if (userInfo.id.toString() != userId) {
+    if (userInfo.id.toString() !== userId) {
       fetchFollowStatus();
     }
   }, []);
@@ -153,6 +155,21 @@ const UserSpaceInfoCard: React.FC<{
           </div>
         </div>
       </div>
+
+      {isEditModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            onClick={() => setIsEditModalOpen(false)} // 点击遮罩关闭弹窗
+          ></div>
+          <div className="bg-gray p-10 rounded-lg shadow-lg z-10 w-[35%] min-h-[90vh] overflow-auto">
+            <EditProfileForm
+              userInfo={userInfo} // 传递用户信息
+              onClose={() => setIsEditModalOpen(false)} // 传递关闭弹窗的函数
+            />
+          </div>
+        </div>
+      )}
 
       {modalData && (
         <div className="fixed inset-0 flex items-center justify-center z-50">

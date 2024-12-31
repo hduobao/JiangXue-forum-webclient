@@ -12,8 +12,6 @@ const TweetDetailPage: React.FC = () => {
   const deviceInfo = GetDeviceInfo();
   const { postID } = useParams<{ postID: string }>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [, setFollowError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [favoriteCount, setFavoriteCount] = useState<number>(0); // 收藏数状态
   const [, setBookmarkError] = useState<string | null>(null);
@@ -41,9 +39,6 @@ const TweetDetailPage: React.FC = () => {
           setFavoriteCount(fetchedTweet.interactive_info.favorite_count);
           setIsLiked(fetchedTweet.interactive_info.is_like);
           setIsBookmarked(fetchedTweet.interactive_info.is_favorite);
-
-          const followResponse = await instance.get(`/api/me/follows/${fetchedTweet.author_id}/status`);
-          setIsFollowing(followResponse.data.data);
         }
       } catch (error) {
         console.error('Failed to fetch tweet:', error);
