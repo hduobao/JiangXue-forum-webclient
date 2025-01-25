@@ -11,7 +11,7 @@ import FavoritesPage from '../pages/FavoritesPage';
 import BrowsingHistoryPage from '../pages/BrowsingHistoryPage';
 import TweetDetailPage from '../pages/TweetDetailPage';
 import CommunityPage from '../pages/CommunityPage';
-import NotificationPage from '../pages/Notification';
+import NotificationPage from '../pages/NotificationPage';
 import ExplorePage from '../pages/ExplorePage';
 
 const MainRoute = () => {

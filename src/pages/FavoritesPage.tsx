@@ -39,7 +39,7 @@ const FavoritesPage: React.FC = () => {
       <div className="sticky top-0 z-10 bg-white shadow-md">
         <TopBar page='收藏' />
       </div>
-      <main className="flex-grow overflow-y-auto">
+      <main className="flex-grow overflow-y-auto scroll-container">
         {/* <h1 className="text-2xl font-semibold mb-4">浏览历史</h1> */}
         {loading ? (
           <Loader />

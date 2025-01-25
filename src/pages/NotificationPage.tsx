@@ -10,7 +10,7 @@ const NotificationPage: React.FC = () => {
       <div className="sticky top-0 z-10 bg-white shadow-md">
         <TopBar page="通知" />
       </div>
-      <main className="flex-grow overflow-y-auto">
+      <main className="flex-grow overflow-y-auto scroll-container">
         {loading ? <Loader /> : <div></div>}
       </main>
     </div>
