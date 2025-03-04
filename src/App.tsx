@@ -9,7 +9,7 @@ import { setUserId } from './storage/storage';
 const App = () => {
   const instance = Instance();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState({ avatar: '', username: '' });
+  const [userInfo, setUserInfo] = useState({ avatar: '', username: '', account: '' });
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -18,6 +18,7 @@ const App = () => {
         setUserInfo({
           avatar: response.data.data.avatar,
           username: response.data.data.username,
+          account: response.data.data.account,
         });
         console.log("id=", response.data.data.id)
         setUserId(response.data.data.id)
@@ -36,7 +37,7 @@ const App = () => {
       <div className="w-full max-w-[1200px] flex relative h-full">
         {/* 左侧边栏 */}
         <div className="w-[250px] h-screen shadow-lg overflow-y-auto border-r border-gray-200 flex-shrink-0">
-          <LeftSidebar avatar={`${userInfo.avatar}`} username={`${userInfo.username}`} />
+          <LeftSidebar avatar={`${userInfo.avatar}`} username={`${userInfo.username}`} account={`${userInfo.account}`} />
         </div>
 
         {/* 中间内容 */}

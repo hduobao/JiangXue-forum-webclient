@@ -1,31 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import Instance from "../../interceptors/auth_interceptor";
 import { ForumVo } from "../../types/ForumModel";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
 
-const ForumButtonBar: React.FC = () => {
+const ForumButtonBar: React.FC<{ forums: ForumVo[]; }> = ({ forums }) => {
 
-    const instance = Instance();
-    const [loading, setLoading] = useState<boolean>(true);
-    const [forums, setForums] = useState<ForumVo[]>([]);
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
     const [showRightArrow, setShowRightArrow] = useState<boolean>(false);
     const [hovering, setHovering] = useState<boolean>(false); // 鼠标悬浮状态
     const scrollContainerRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
-      const fetchForum = async () => {
-        try {
-          const response = await instance.get("/api/forum/list");
-          setForums(response.data.data);
-        } catch (error) {
-          // Handle error (you may want to display an error message)
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchForum();
+
     }, []);
   
     const handleScroll = () => {

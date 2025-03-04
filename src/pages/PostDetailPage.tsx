@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
-import { PostVo } from '../types/PostModel';
+import { TweetVo } from '../types/TweetModel';
 import { IconThumbUp, IconThumbUpFilled, IconShare, IconMessage2, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react'; // 引入 IconBookmarkFilled
 import GetDeviceInfo from '../component/common/UseDeviceInfo';
 
-const PostDetail: React.FC = () => {
+const TweetDetail: React.FC = () => {
   const instance = Instance();
   const deviceInfo = GetDeviceInfo();
-  const { postID } = useParams<{ postID: string }>();
-  const [post, setPost] = useState<PostVo | null>(null);
+  const { tweetID } = useParams<{ tweetID: string }>();
+  const [tweet, setTweet] = useState<TweetVo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -27,34 +27,34 @@ const PostDetail: React.FC = () => {
   useEffect(() => {
     const forumID = 1;
 
-    const fetchPostDetail = async () => {
+    const fetchTweetDetail = async () => {
       try {
-        const response = await instance.get(`/api/1/posts/${postID}`, {
+        const response = await instance.get(`/api/1/tweets/${tweetID}`, {
           params: {
             forumID,
           },
         });
-        const postData = response.data.data;
-        setPost(postData);
+        const tweetData = response.data.data;
+        setTweet(tweetData);
 
-        setLikeCount(postData.interactive_info.like_count);
-        setFavoriteCount(postData.interactive_info.favorite_count);
-        setIsLiked(postData.interactive_info.is_like);
-        setIsBookmarked(postData.interactive_info.is_favorite);
+        setLikeCount(tweetData.interactive_info.like_count);
+        setFavoriteCount(tweetData.interactive_info.favorite_count);
+        setIsLiked(tweetData.interactive_info.is_like);
+        setIsBookmarked(tweetData.interactive_info.is_favorite);
 
-        const followResponse = await instance.get(`/api/me/follows/${postData.author_id}/status`);
+        const followResponse = await instance.get(`/api/me/follows/${tweetData.author_id}/status`);
         setIsFollowing(followResponse.data.data);
       } catch (error) {
-        console.error('Failed to fetch post details:', error);
-        setError('Failed to load post details');
+        console.error('Failed to fetch tweet details:', error);
+        setError('Failed to load tweet details');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPostDetail();
+    fetchTweetDetail();
 
-  }, [postID]);
+  }, [tweetID]);
 
   useEffect(() => {
     // 记录页面加载时的时间
@@ -63,8 +63,8 @@ const PostDetail: React.FC = () => {
     const handlePopState = () => {
       const endVisitedAt = new Date();
       const visitDuration = Math.floor((endVisitedAt.getTime() - startVisitedAt.getTime()) / 1000); // 计算停留时间（秒）
-      instance.post(`/api/users/${post?.author_id}/browsing-history`, {
-        content_id: Number(postID),
+      instance.post(`/api/users/${tweet?.author_id}/browsing-history`, {
+        content_id: Number(tweetID),
         tab: '',
         visited_at: startVisitedAt.toISOString(),
         visit_duration: visitDuration,
@@ -85,10 +85,10 @@ const PostDetail: React.FC = () => {
 
 
   const handleLike = async () => {
-    if (!post) return;
+    if (!tweet) return;
 
     try {
-      await instance.post(`/api/posts/${postID}/like`);
+      await instance.post(`/api/tweets/${tweetID}/like`);
       setIsLiked((prev) => !prev);
       setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1)); // 更新点赞数
     } catch (error) {
@@ -97,10 +97,10 @@ const PostDetail: React.FC = () => {
   };
 
   const handleBookmark = async () => {
-    if (!post) return;
+    if (!tweet) return;
 
     try {
-      await instance.post(`/api/posts/${postID}/favorite`);
+      await instance.post(`/api/tweets/${tweetID}/favorite`);
       setIsBookmarked((prev) => !prev);
 
       // 更新收藏数，增加或减少
@@ -113,14 +113,14 @@ const PostDetail: React.FC = () => {
 
 
   const handleAuthorClick = () => {
-    navigate(`/user-profile/${post?.author_id}`);
+    navigate(`/user-profile/${tweet?.author_id}`);
   };
 
   const handleFollow = async () => {
-    if (!post) return;
+    if (!tweet) return;
 
     try {
-      await instance.post(`/api/me/follows/${post.author_id}`);
+      await instance.post(`/api/me/follows/${tweet.author_id}`);
       setIsFollowing((prev) => !prev);
     } catch (error) {
       console.error('Failed to update follow status:', error);
@@ -140,20 +140,20 @@ const PostDetail: React.FC = () => {
     return <div className="text-red-500 text-center mt-10">{error}</div>;
   }
 
-  if (!post) {
-    return <div className="text-center mt-10">No post found.</div>;
+  if (!tweet) {
+    return <div className="text-center mt-10">No tweet found.</div>;
   }
 
   return (
     <div className="container mx-auto p-6">
-      {/* Post Header */}
+      {/* Tweet Header */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h1 className="text-3xl font-bold">{post.title}</h1>
+          <h1 className="text-3xl font-bold">{tweet.title}</h1>
           <div className="flex items-center mt-2">
             <img
-              src={post.author_avatar}
-              alt={post.author_name}
+              src={tweet.author_avatar}
+              alt={tweet.author_name}
               className="w-16 h-16 rounded-full mr-2 object-cover cursor-pointer"
               onClick={handleAuthorClick}
             />
@@ -162,7 +162,7 @@ const PostDetail: React.FC = () => {
                 className="text-base font-semibold cursor-pointer"
                 onClick={handleAuthorClick}
               >
-                {post.author_name}
+                {tweet.author_name}
               </p>
               <button
                 onClick={handleFollow}
@@ -175,18 +175,18 @@ const PostDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Post Metadata */}
+      {/* Tweet Metadata */}
       <div className="flex justify-between items-center mb-4">
         <div className="text-sm text-gray-600">
           {/* 显示点赞和收藏数 */}
           {/* {`Likes: ${likeCount} | Favorites: ${favoriteCount}`} */}
         </div>
-        <div className="text-sm text-gray-500">Posted on {post.created_at}</div>
+        <div className="text-sm text-gray-500">Tweeted on {tweet.created_at}</div>
       </div>
 
-      {/* Post Content */}
+      {/* Tweet Content */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <p className="text-base leading-relaxed">{post.content}</p>
+        <p className="text-base leading-relaxed">{tweet.content}</p>
       </div>
 
       {/* Interaction Buttons */}
@@ -238,4 +238,4 @@ const PostDetail: React.FC = () => {
 
 };
 
-export default PostDetail;
+export default TweetDetail;

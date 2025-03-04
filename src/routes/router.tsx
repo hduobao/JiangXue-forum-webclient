@@ -21,7 +21,7 @@ const MainRoute = () => {
         <Route path="login" element={<LoginPage />} />
         <Route path="/" element={<App />}>
           <Route path="home" element={<ProtectedRoute element={<HomePage />} />} />
-          <Route path="tweet/:postID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
+          <Route path="tweet/:tweetID" element={<ProtectedRoute element={<TweetDetailPage />} />} />
           <Route path="user-profile" element={<ProtectedRoute element={<UserSpacePage />} />} />
           <Route path="user-profile/:authorID" element={<ProtectedRoute element={<UserSpacePage />} />} />
           <Route path="notifications" element={<ProtectedRoute element={<NotificationPage />} />} />

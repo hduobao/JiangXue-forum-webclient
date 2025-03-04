@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
-import { ListPostVo } from '../types/PostModel';
+import { ListTweetVo } from '../types/TweetModel';
 import TopBar from '../component/bar/TopBar';
 import Loader from '../component/common/Loader';
 import Tweet from '../component/tweet/Tweet';
 
 const FavoritesPage: React.FC = () => {
-  const [posts, setPosts] = useState<ListPostVo[]>([]);
+  const [tweets, setTweets] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const FavoritesPage: React.FC = () => {
     const fetchFavorites = async () => {
       try {
         const response = await instance.get('/api/me/favorites');
-        setPosts(response.data.data);
+        setTweets(response.data.data);
       } catch (error) {
         console.error('Failed to fetch favorites:', error);
         setError('Failed to load favorites');
@@ -30,8 +30,8 @@ const FavoritesPage: React.FC = () => {
     fetchFavorites();
   }, []);
 
-  const handleTweetClick = (postId: number) => {
-    navigate(`/tweet/${postId}`);
+  const handleTweetClick = (tweetId: number) => {
+    navigate(`/tweet/${tweetId}`);
   };
 
   return (
@@ -48,8 +48,8 @@ const FavoritesPage: React.FC = () => {
         ) : (
           <div className="flex justify-center">
             <div className="w-full max-w-3xl px-4 overflow-y-auto">
-              {posts.map((tweet, index) => (
-                <Tweet key={index} post={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
+              {tweets.map((tweet, index) => (
+                <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
               ))}
             </div>
           </div>

@@ -3,12 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IconArrowLeft } from "@tabler/icons-react";
 import SearchForm from "../form/SearchForm";
 
-const TopBar: React.FC<{ page: string }> = ({ page }) => {
+const TopBar: React.FC<{ 
+  page: string; 
+  activeTab?: string; 
+  setActiveTab?: React.Dispatch<React.SetStateAction<string>> 
+}> = ({ page, activeTab = '', setActiveTab = () => {} }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("recommendations"); // 默认激活标签
 
-  // 处理标签点击
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };

@@ -4,34 +4,46 @@ import TopBar from "../component/bar/TopBar";
 import Instance from "../interceptors/auth_interceptor";
 import ForumButtonBar from "../component/bar/ForumButtonBar";
 import { useNavigate } from "react-router-dom";
-import { ListPostVo } from "../types/PostModel";
+import { ListTweetVo } from "../types/TweetModel";
 import Tweet from "../component/tweet/Tweet";
 import BackTopButton from "../component/button/BackTopButton";
+import { ForumVo } from "../types/ForumModel";
 
 const CommunityPage: React.FC = () => {
   const instance = Instance();
   const navigate = useNavigate(); // 使用 useNavigate
-  const [posts, setPosts] = useState<ListPostVo[]>([]);
+  const [tweets, setTweets] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
+  const [forums, setForums] = useState<ForumVo[]>([]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchForum = async () => {
+      try {
+        const response = await instance.get("/api/forum/list");
+        setForums(response.data.data);
+      } catch (error) {
+      }
+    };
+  
+    fetchForum();
+    
+    const fetchTweets = async () => {
       try {
         const offset = 1;
         const limit = 10;
-        const response = await instance.get(`/api/1/posts`, {
+        const response = await instance.get(`/api/1/tweets`, {
           params: { offset, limit },
         });
-        setPosts(response.data.data);
+        setTweets(response.data.data);
       } catch (error) {
-        console.error("Failed to fetch posts:", error);
+        console.error("Failed to fetch tweets:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPosts();
+    fetchTweets();
 
     const scrollContainer = document.querySelector(".scroll-container");
     if (!scrollContainer) return;
@@ -62,8 +74,8 @@ const CommunityPage: React.FC = () => {
   };
 
   // 点击推文时的处理函数
-  const handleTweetClick = (postID: number) => {
-    navigate(`/tweet/${postID.toString()}`);
+  const handleTweetClick = (tweetID: number) => {
+    navigate(`/tweet/${tweetID.toString()}`);
   };
 
   return (
@@ -76,13 +88,13 @@ const CommunityPage: React.FC = () => {
           <Loader />
         ) : (
           <div>
-            <ForumButtonBar />
+            <ForumButtonBar forums={forums} />
             <div className="flex justify-center">
               <div className="w-full max-w-3xl px-4">
-                {posts.map((tweet, index) => (
+                {tweets.map((tweet, index) => (
                   <Tweet
                     key={index}
-                    post={tweet}
+                    tweet={tweet}
                     onClick={() => handleTweetClick(tweet.id)}
                   /> // 传递点击事件
                 ))}

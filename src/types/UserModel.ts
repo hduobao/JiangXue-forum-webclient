@@ -1,6 +1,7 @@
 export interface SidebarProps {
     avatar: string;
     username: string;
+    account: string;
 }
 
 export interface RightSidebarProps {

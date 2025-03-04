@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // 导入 useNavigate
 import Instance from '../../interceptors/auth_interceptor';
-import { ListPostVo } from "../../types/PostModel";
+import { ListTweetVo } from "../../types/TweetModel";
 import Tweet from './Tweet'; 
 import Loader from '../common/Loader';
 import BackTopButton from '../button/BackTopButton';
 
-const TweetFeed: React.FC = () => {
+const TweetFeed: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const instance = Instance();
   const navigate = useNavigate(); // 使用 useNavigate
-  const [posts, setPosts] = useState<ListPostVo[]>([]);
+  const [tweets, setTweets] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    setLoading(true)
+    const fetchTweets = async () => {
       try {
         const offset = 1;
         const limit = 10;
-        const response = await instance.get(`/api/1/posts`, {
-          params: { offset, limit },
+        const response = await instance.get(`/api/1/tweets`, {
+          params: { offset, limit, tab : activeTab },
         });
-        setPosts(response.data.data);
+        setTweets(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch posts:', error);
+        console.error('Failed to fetch tweets:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPosts();
+    fetchTweets();
 
     const scrollContainer = document.querySelector(".scroll-container");
     if (!scrollContainer) return;
@@ -47,7 +48,7 @@ const TweetFeed: React.FC = () => {
     return () => {
       scrollContainer.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [activeTab]);
 
   const scrollToTop = () => {
     const scrollContainer = document.querySelector(".scroll-container");
@@ -59,8 +60,8 @@ const TweetFeed: React.FC = () => {
   };
 
   // 点击推文时的处理函数
-  const handleTweetClick = (postID: number) => {
-    navigate(`/tweet/${postID.toString()}`); // 将 postID 转换为字符串
+  const handleTweetClick = (tweetID: number) => {
+    navigate(`/tweet/${tweetID.toString()}`); // 将 tweetID 转换为字符串
   };
   
   return (
@@ -69,8 +70,8 @@ const TweetFeed: React.FC = () => {
         <Loader />
       ) : (
       <div className="w-full max-w-3xl px-4 overflow-y-auto">
-        {posts.map((post, index) => (
-          <Tweet key={index} post={post} onClick={() => handleTweetClick(post.id)} /> // 传递点击事件
+        {tweets.map((tweet, index) => (
+          <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
         ))}
         {showBackTopButton && <BackTopButton onClick={scrollToTop} />}
       </div>

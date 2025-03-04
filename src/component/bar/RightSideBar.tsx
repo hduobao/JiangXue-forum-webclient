@@ -37,7 +37,7 @@ const RightSidebar: React.FC<RightSidebarProps> = () => {
               <div className="flex justify-between">
                 <div>
                   <p className="font-medium">{topic.topic}</p>
-                  <p className="text-sm text-gray-500">{topic.tweets} Tweets</p>
+                  <p className="text-sm text-gray-500">{topic.tweets}</p>
                 </div>
                 <button className="text-blue-500 text-sm">关注</button>
               </div>
@@ -68,7 +68,7 @@ const RightSidebar: React.FC<RightSidebarProps> = () => {
 
       {/* 版权信息 */}
       <div className="text-gray-400 text-xs">
-        <p>© 2024 Twitter, Inc.</p>
+        <p>© 2024 SnowFlow, Inc.</p>
       </div>
     </div>
   );

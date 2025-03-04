@@ -27,7 +27,7 @@ const SearchForm = ({ width = '300px', searchContent = '' }: StyledWrapperProps)
             className="input"
             type="text"
             required
-            placeholder="Search twitter"
+            placeholder="Search"
             id="search"
             value={searchText} // 设置输入框的值
             onChange={handleChange} // 更新输入框的内容

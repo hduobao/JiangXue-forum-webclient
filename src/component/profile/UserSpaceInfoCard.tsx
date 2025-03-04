@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Instance from "../../interceptors/auth_interceptor";
 import { getUserId } from "../../storage/storage";
 import EditProfileForm from "./EditProfileForm";
+import PostModal from "../form/TweetPublishForm";
 
 const UserSpaceInfoCard: React.FC<{
   userInfo: UserBaseInfo;

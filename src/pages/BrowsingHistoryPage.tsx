@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../component/bar/TopBar';
 import Instance from '../interceptors/auth_interceptor';
-import { ListPostVo } from "../types/PostModel";
+import { ListTweetVo } from "../types/TweetModel";
 import Tweet from '../component/tweet/Tweet'; 
 import Loader from '../component/common/Loader';
 
 const BrowsingHistoryPage: React.FC = () => {
   const instance = Instance();
   const navigate = useNavigate();
-  const [history, setHistory] = useState<ListPostVo[]>([]);
+  const [history, setHistory] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,8 +29,8 @@ const BrowsingHistoryPage: React.FC = () => {
     fetchHistory();
   }, []);
 
-  const handleTweetClick = (postID: number) => {
-    navigate(`/tweet/${postID.toString()}`); // 将 postID 转换为字符串
+  const handleTweetClick = (tweetID: number) => {
+    navigate(`/tweet/${tweetID.toString()}`); // 将 tweetID 转换为字符串
   };
 
   return (
@@ -48,7 +48,7 @@ const BrowsingHistoryPage: React.FC = () => {
           <div className="flex justify-center">
             <div className="w-full max-w-3xl px-4 overflow-y-auto">
               {history.map((tweet, index) => (
-                <Tweet key={index} post={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
+                <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
               ))}
             </div>
           </div>

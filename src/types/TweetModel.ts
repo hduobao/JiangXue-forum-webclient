@@ -8,11 +8,12 @@ export interface InteractiveInfo {
   is_favorite: boolean;    // 对应 Go 的 is_favorite
 }
 
-// ListPostVo TypeScript interface
-export interface ListPostVo {
+// ListTweetVo TypeScript interface
+export interface ListTweetVo {
   id: number;               // 对应 Go 的 id
   title: string;
   content: string;
+  account: string;
   author_id: number;        // 对应 Go 的 author_id
   author_avatar: string;
   author_name: string;      // 对应 Go 的 author_name
@@ -25,11 +26,12 @@ export interface ListPostVo {
   interactive_info: InteractiveInfo; // 对应 Go 的 interactive_info
 }
 
-// PostVo TypeScript interface
-export interface PostVo {
+// TweetVo TypeScript interface
+export interface TweetVo {
   id: number;
   title: string;
   content: string;
+  account: string;
   author_id: number;
   author_name: string;
   author_avatar: string;
