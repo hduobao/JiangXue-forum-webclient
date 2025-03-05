@@ -2,14 +2,9 @@ import { Fragment, useState, useRef, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { motion } from 'framer-motion';
 import TextareaAutosize from 'react-textarea-autosize';
-import { 
-  IconX, 
-  IconPhoto, 
-  IconChartBar, 
-  IconMapPin, 
-  IconMoodSmile, 
-  IconCalendar
-} from "@tabler/icons-react";
+import { IconX, IconPhoto, IconChartBar, IconMapPin, IconMoodSmile, IconCalendar, IconTrash } from "@tabler/icons-react";
+import Instance from '../../interceptors/auth_interceptor';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 interface PostModalProps {
   isOpen: boolean;
@@ -18,9 +13,13 @@ interface PostModalProps {
 }
 
 const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) => {
+  const instance = Instance()
+  const navigate = useNavigate();
   const [text, setText] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
@@ -28,17 +27,65 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
     }
   }, [isOpen]);
 
-  const handleSubmit = async () => {
-    if (!text.trim()) return;
-    
-    setIsSubmitting(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setText('');
-    setIsSubmitting(false);
-    onClose();
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setSelectedFiles((prevFiles) => [...prevFiles, ...fileArray]);
+    }
   };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async () => {
+    if (!text.trim() && selectedFiles.length === 0) return;
+  
+    setIsSubmitting(true);
+    let uploadedFiles = [];
+  
+    try {
+      // 仅当有文件时才触发上传
+      if (selectedFiles.length > 0) {
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
+          formData.append("files", file);
+        });
+
+        const uploadResponse = await instance.post("/api/file/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+  
+        if (uploadResponse.status !== 200) {
+          throw new Error("上传失败");
+        }
+  
+        uploadedFiles = uploadResponse.data.data;
+      }
+  
+      // 触发发布接口
+      await instance.post('/api/tweets', {
+        title: "aaa",
+        content: text,
+        forum_id: 1,
+        file_ids: uploadedFiles, // 仅当有上传文件时才传递
+      });
+  
+      setText('');
+      setSelectedFiles([]);
+      onClose();
+
+      navigate(0)
+    } catch (error) {
+      console.error("发布失败:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
 
   const iconButtonClass = "text-blue-500 hover:bg-blue-50 rounded-full p-2 transition-colors duration-200";
 
@@ -78,9 +125,9 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={!text.trim() || isSubmitting}
+                    disabled={(!text.trim() && selectedFiles.length === 0) || isSubmitting}
                     className={`px-4 py-1.5 rounded-full font-bold text-white ${
-                      !text.trim() || isSubmitting
+                      (!text.trim() && selectedFiles.length === 0) || isSubmitting
                         ? 'bg-blue-300 cursor-not-allowed'
                         : 'bg-blue-500 hover:bg-blue-600'
                     } transition-colors`}
@@ -104,11 +151,6 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                     className="h-10 w-10 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <div className="mb-2">
-                      <button className="text-sm font-semibold text-blue-500 border border-blue-500 rounded-full px-3 py-0.5 hover:bg-blue-50 transition-colors">
-                        所有人可评论
-                      </button>
-                    </div>
                     <TextareaAutosize
                       ref={textareaRef}
                       value={text}
@@ -118,9 +160,41 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                       minRows={3}
                       maxRows={12}
                     />
+
+                    {selectedFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {selectedFiles.map((file, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt="Preview"
+                              className="w-[150px] h-[150px] object-cover rounded-md"
+                            />
+                            <button
+                              onClick={() => handleRemoveFile(index)}
+                              className="absolute top-0 right-0 bg-gray-800 text-white p-1 rounded-full"
+                            >
+                              <IconTrash className="h-5 w-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
                       <div className="flex space-x-1">
-                        <button className={iconButtonClass}>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/*,video/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                          multiple
+                        />
+                        <button
+                          className={iconButtonClass}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
                           <IconPhoto className="h-5 w-5" />
                         </button>
                         <button className={iconButtonClass}>
@@ -136,30 +210,6 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                           <IconCalendar className="h-5 w-5" />
                         </button>
                       </div>
-                      <div className="flex items-center">
-                        {text.length > 0 && (
-                          <motion.div 
-                            className="relative mr-3 h-7 w-7"
-                            initial={false}
-                          >
-                            <motion.div
-                              className="absolute inset-0 rounded-full"
-                              style={{
-                                background: `conic-gradient(#1d9bf0 ${Math.min(text.length / 280, 1) * 100}%, transparent 0)`,
-                                opacity: text.length > 260 ? 1 : 0.5
-                              }}
-                            />
-                            <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                              <span className={`text-xs font-semibold ${
-                                text.length > 280 ? 'text-red-500' : 
-                                text.length > 260 ? 'text-yellow-500' : 'text-gray-500'
-                              }`}>
-                                {280 - text.length}
-                              </span>
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -173,3 +223,7 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
 };
 
 export default PostModal;
+function refreshUser() {
+  throw new Error('Function not implemented.');
+}
+
