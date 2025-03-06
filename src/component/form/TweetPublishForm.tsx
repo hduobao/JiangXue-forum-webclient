@@ -1,10 +1,19 @@
-import { Fragment, useState, useRef, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { motion } from 'framer-motion';
-import TextareaAutosize from 'react-textarea-autosize';
-import { IconX, IconPhoto, IconChartBar, IconMapPin, IconMoodSmile, IconCalendar, IconTrash } from "@tabler/icons-react";
-import Instance from '../../interceptors/auth_interceptor';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Fragment, useState, useRef, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { motion } from "framer-motion";
+import TextareaAutosize from "react-textarea-autosize";
+import {
+  IconX,
+  IconPhoto,
+  IconChartBar,
+  IconMapPin,
+  IconMoodSmile,
+  IconCalendar,
+} from "@tabler/icons-react";
+import Instance from "../../interceptors/auth_interceptor";
+import { useNavigate } from "react-router-dom";
+import { useFileUploader } from "./FIleUploader";
+import { UploadZone } from "./UploadZone";
 
 interface PostModalProps {
   isOpen: boolean;
@@ -12,14 +21,89 @@ interface PostModalProps {
   userAvatar: string;
 }
 
-const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) => {
-  const instance = Instance()
+const PostModal: React.FC<PostModalProps> = ({
+  isOpen,
+  onClose,
+  userAvatar,
+}) => {
+  const instance = Instance();
   const navigate = useNavigate();
-  const [text, setText] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [text, setText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // 用于触发文件选择
+
+  // 使用上传组件逻辑
+  const { uploadTasks, handleFileChange, removeUploadTask } = useFileUploader({
+    folder: "tweet",
+    maxFiles: 4,
+    allowedTypes: ["image/*", "video/*"],
+    getUploadToken: async ({ md5, fileName, fileType, folder }) => {
+      const response = await instance.get("/api/file/token", {
+        params: { md5, fileName, fileType, folder },
+      });
+      return response.data.data;
+    },
+  });
+
+  const handleRemoveFile = (id: string) => {
+    removeUploadTask(id); // 调用删除方法
+  };
+
+  const handleSubmit = async () => {
+    if (!text.trim() && uploadTasks.length === 0) return;
+
+    // 检查是否有未完成的上传任务
+    const hasUnfinished = uploadTasks.some(
+      (task) => task.status !== "success" && task.status !== "error"
+    );
+
+    if (hasUnfinished) {
+      alert("请等待文件上传完成");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 获取所有成功上传的文件 key
+      const fileKeys = uploadTasks
+        .filter((task) => task.status === "success")
+        .map((task) => task.key) as string[];
+
+      // 提交推文内容
+      await instance.post("/api/tweets", {
+        title: "aaa",
+        content: text,
+        forum_id: 1,
+        file_keys: fileKeys,
+      });
+
+      // 重置状态
+      setText("");
+      onClose();
+      navigate(0);
+    } catch (error) {
+      console.error("发布失败:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 触发文件选择
+  const handleFileSelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // 触发隐藏的文件输入框
+    }
+  };
+
+  // 处理文件选择
+  const onFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      handleFileChange(files); // 将文件传递给上传逻辑
+    }
+  };
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
@@ -27,67 +111,8 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
     }
   }, [isOpen]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setSelectedFiles((prevFiles) => [...prevFiles, ...fileArray]);
-    }
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = async () => {
-    if (!text.trim() && selectedFiles.length === 0) return;
-  
-    setIsSubmitting(true);
-    let uploadedFiles = [];
-  
-    try {
-      // 仅当有文件时才触发上传
-      if (selectedFiles.length > 0) {
-        const formData = new FormData();
-        selectedFiles.forEach((file) => {
-          formData.append("files", file);
-        });
-
-        const uploadResponse = await instance.post("/api/file/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-  
-        if (uploadResponse.status !== 200) {
-          throw new Error("上传失败");
-        }
-  
-        uploadedFiles = uploadResponse.data.data;
-      }
-  
-      // 触发发布接口
-      await instance.post('/api/tweets', {
-        title: "aaa",
-        content: text,
-        forum_id: 1,
-        file_ids: uploadedFiles, // 仅当有上传文件时才传递
-      });
-  
-      setText('');
-      setSelectedFiles([]);
-      onClose();
-
-      navigate(0)
-    } catch (error) {
-      console.error("发布失败:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-
-  const iconButtonClass = "text-blue-500 hover:bg-blue-50 rounded-full p-2 transition-colors duration-200";
+  const iconButtonClass =
+    "text-blue-500 hover:bg-blue-50 rounded-full p-2 transition-colors duration-200";
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -125,21 +150,27 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={(!text.trim() && selectedFiles.length === 0) || isSubmitting}
+                    disabled={
+                      (!text.trim() && uploadTasks.length === 0) || isSubmitting
+                    }
                     className={`px-4 py-1.5 rounded-full font-bold text-white ${
-                      (!text.trim() && selectedFiles.length === 0) || isSubmitting
-                        ? 'bg-blue-300 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600'
+                      (!text.trim() && uploadTasks.length === 0) || isSubmitting
+                        ? "bg-blue-300 cursor-not-allowed"
+                        : "bg-blue-500 hover:bg-blue-600"
                     } transition-colors`}
                   >
                     {isSubmitting ? (
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                         className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
                       />
                     ) : (
-                      '发布'
+                      "发布"
                     )}
                   </button>
                 </div>
@@ -161,42 +192,34 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
                       maxRows={12}
                     />
 
-                    {selectedFiles.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {selectedFiles.map((file, index) => (
-                          <div key={index} className="relative">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt="Preview"
-                              className="w-[150px] h-[150px] object-cover rounded-md"
-                            />
-                            <button
-                              onClick={() => handleRemoveFile(index)}
-                              className="absolute top-0 right-0 bg-gray-800 text-white p-1 rounded-full"
-                            >
-                              <IconTrash className="h-5 w-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="mb-4">
+                      <UploadZone
+                        tasks={uploadTasks}
+                        onFileChange={handleFileChange}
+                        onRemove={handleRemoveFile}
+                        maxFiles={4}
+                      />
+                    </div>
+
+                    {/* 隐藏的文件输入框 */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={onFileInputChange}
+                      accept="image/*,video/*"
+                      multiple
+                    />
 
                     <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
                       <div className="flex space-x-1">
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          accept="image/*,video/*"
-                          className="hidden"
-                          onChange={handleFileChange}
-                          multiple
-                        />
                         <button
                           className={iconButtonClass}
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={handleFileSelect} // 触发文件选择
                         >
                           <IconPhoto className="h-5 w-5" />
                         </button>
+
                         <button className={iconButtonClass}>
                           <IconChartBar className="h-5 w-5" />
                         </button>
@@ -223,7 +246,3 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, userAvatar }) =>
 };
 
 export default PostModal;
-function refreshUser() {
-  throw new Error('Function not implemented.');
-}
-

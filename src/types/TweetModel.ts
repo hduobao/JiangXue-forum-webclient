@@ -1,30 +1,31 @@
 // types.ts 或者其他文件
 export interface InteractiveInfo {
-  view_count: number;      // 对应 Go 的 view_count
-  comment_count: number;   // 对应 Go 的 comment_count
-  like_count: number;      // 对应 Go 的 like_count
-  favorite_count: number;  // 对应 Go 的 favorite_count
-  is_like: boolean;        // 对应 Go 的 is_like
-  is_favorite: boolean;    // 对应 Go 的 is_favorite
+  view_count: number;
+  comment_count: number;
+  like_count: number;
+  favorite_count: number;
+  is_like: boolean;
+  is_favorite: boolean;
 }
 
 // ListTweetVo TypeScript interface
 export interface ListTweetVo {
-  id: number;               // 对应 Go 的 id
+  id: number;
   title: string;
   content: string;
   account: string;
-  author_id: number;        // 对应 Go 的 author_id
+  author_id: number;
   author_avatar: string;
-  author_name: string;      // 对应 Go 的 author_name
-  cover_image: string;      // 对应 Go 的 cover_image
-  forum_id: number;         // 对应 Go 的 forum_id
-  is_essence: boolean;      // 对应 Go 的 is_essence
-  is_top: boolean;          // 对应 Go 的 is_top
-  created_at: string;       // 对应 Go 的 created_at
-  updated_at: string;       // 对应 Go 的 updated_at
-  interactive_info: InteractiveInfo; // 对应 Go 的 interactive_info
+  author_name: string; 
+  forum_id: number;
+  is_essence: boolean;
+  is_top: boolean;
+  created_at: string;
+  updated_at: string;
+  images: string[];
+  interactive_info: InteractiveInfo;
 }
+
 
 // TweetVo TypeScript interface
 export interface TweetVo {
@@ -41,5 +42,6 @@ export interface TweetVo {
   is_top: boolean;
   created_at: string;
   updated_at: string;
+  images: string[];
   interactive_info: InteractiveInfo;
 }

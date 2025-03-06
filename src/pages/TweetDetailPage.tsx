@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react"; // 导入图标
 import Loader from "../component/common/Loader";
 import CommentModal from "../component/comment/CommentModel"; // 引入 CommentModal 组件
+import MediaDisplay from "../component/tweet/MediaDisplay";
 
 const TweetDetailPage: React.FC = () => {
   const instance = Instance();
@@ -157,14 +158,14 @@ const TweetDetailPage: React.FC = () => {
   const handleShareClick = async () => {};
 
   return (
-    <div className="flex-grow flex flex-col h-screen overflow-y-auto">
+    <div className="flex-grow flex flex-col h-screen">
       <div className="sticky top-0 z-10 bg-white shadow-md">
         <TopBar page="帖子详情" />
       </div>
       {loading ? (
         <Loader />
       ) : (
-        <div className="w-full max-w-3xl px-4">
+        <div className="w-full max-w-3xl px-4 overflow-y-auto scroll-container">
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-2xl font-bold mb-2">{tweet?.title}</h2>
             <div className="flex items-center mb-4">
@@ -190,9 +191,9 @@ const TweetDetailPage: React.FC = () => {
               </div>
             </div>
             <p className="text-gray-700 mb-4">{tweet?.content}</p>
-
+            <MediaDisplay media={tweet?.images || []} />
             {/* Interactive Info */}
-            <div className="flex justify-between text-gray-500 mb-4">
+            <div className="flex justify-between text-gray-500 my-4">
               <button
                 className="flex items-center space-x-2 hover:text-blue-500"
                 onClick={handleCommentClick}

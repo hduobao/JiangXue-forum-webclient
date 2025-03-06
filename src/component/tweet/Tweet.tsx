@@ -10,14 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { ListTweetVo } from "../../types/TweetModel";
 import { getUserId } from "../../storage/storage";
 import Instance from "../../interceptors/auth_interceptor";
-import CommentModal from "../comment/CommentModel"; // 引入 CommentModal 组件
+import CommentModal from "../comment/CommentModel";
+import MediaDisplay from "./MediaDisplay"; // 根据实际路径调整
 
 const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
   tweet,
   onClick,
 }) => {
   const userId = getUserId();
-
   const instance = Instance();
   const navigate = useNavigate();
 
@@ -27,46 +27,35 @@ const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
   const [likeCount, setLikeCount] = useState<number>(
     tweet.interactive_info.like_count
   );
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 管理弹窗的显示状态
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleLike = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation(); // 阻止事件冒泡
-    if (!tweet) return;
-
+    event.stopPropagation();
     try {
       await instance.post(`/api/tweets/${tweet.id}/like`);
       setIsLiked((prev) => !prev);
-      setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1)); // 更新点赞数
+      setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     } catch (error) {
       console.error("Failed to update like status:", error);
     }
   };
 
-  const handleAuthorClick = async (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleAuthorClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    if (!tweet) return;
-    if (userId == tweet.author_id.toString()) {
+    if (userId === tweet.author_id.toString()) {
       navigate(`/user-profile`);
     } else {
       navigate(`/user-profile/${tweet.author_id}`);
     }
   };
 
-  const handleCommentClick = async (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.stopPropagation();
-    setIsModalOpen(true); // 打开评论弹窗
-  };
-
-  const handleModalClose = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    setIsModalOpen(false); // 关闭评论弹窗
-  };
+  // 如果存在媒体（图片或视频），文字最多显示5行，否则显示10行
+  const hasMedia = tweet.images && tweet.images.length > 0;
+  const textClampClass = hasMedia ? "line-clamp-5" : "line-clamp-10";
 
   return (
     <div
-      className="bg-white shadow-md rounded-lg p-4 mb-6 cursor-pointer"
+      className="bg-white shadow-md rounded-lg p-4 mb-6 cursor-pointer max-h-[133vh] overflow-hidden"
       onClick={onClick}
     >
       <div className="flex items-start">
@@ -76,11 +65,11 @@ const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
             src={tweet.author_avatar || "/static/images/avatar/1.jpg"}
             alt="User Avatar"
             className="w-12 h-12 rounded-full object-cover"
-            style={{ width: "48px", height: "48px" }} // 固定宽高为 48x48 px，保持圆形
           />
         </div>
+
         <div className="flex-grow ml-4">
-          {/* 用户名和推文内容 */}
+          {/* 用户名和推文头部信息 */}
           <div className="flex justify-between items-center">
             <div>
               <span className="font-semibold text-gray-800">
@@ -94,15 +83,23 @@ const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
               {new Date(tweet.created_at).toLocaleTimeString()}
             </span>
           </div>
-          <p className="mt-2 text-gray-700 tracking-widest line-clamp-10">
+
+          {/* 推文内容 */}
+          <p className={`mt-2 text-gray-700 tracking-widest ${textClampClass}`}>
             {tweet.content}
           </p>
 
-          {/* 操作按钮 */}
+          {/* 使用媒体展示组件 */}
+          <MediaDisplay media={tweet.images || []} />
+
+          {/* 互动按钮 */}
           <div className="flex justify-between mt-4 text-gray-500">
             <button
               className="flex items-center space-x-2 hover:text-blue-500"
-              onClick={handleCommentClick}
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsModalOpen(true);
+              }}
             >
               <IconMessageCircle />
               <span className="ml-2 text-current">
@@ -120,16 +117,15 @@ const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
               onClick={handleLike}
             >
               {isLiked ? (
-                <IconHeartFilled size={24} className={`text-current`} />
+                <IconHeartFilled size={24} className="text-current" />
               ) : (
                 <IconHeart
                   size={24}
-                  className={`text-current hover:text-pink-500`}
+                  className="text-current hover:text-pink-500"
                 />
               )}
               <span className="ml-2 text-current">{likeCount}</span>
             </button>
-
             <button className="flex items-center space-x-2 hover:text-blue-500">
               <IconEye />
               <span className="ml-2 text-current">
@@ -139,21 +135,20 @@ const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({
           </div>
         </div>
       </div>
+
+      {/* 评论模态框 */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50"></div>
-          <div
-            className="bg-white rounded-lg shadow-lg z-10 max-w-screen-sm max-h-screen overflow-auto"
-            onClick={handleModalClose}
-          >
+          <div className="bg-white rounded-lg shadow-lg z-10 max-w-screen-sm max-h-screen overflow-auto">
             <CommentModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              replyingTo={tweet?.account}
-              tweetId={tweet?.id}
-              authorAvatar={tweet?.author_avatar}
-              authorName={tweet?.author_name}
-              tweetTextContent={tweet?.content}
+              replyingTo={tweet.account}
+              tweetId={tweet.id}
+              authorAvatar={tweet.author_avatar}
+              authorName={tweet.author_name}
+              tweetTextContent={tweet.content}
             />
           </div>
         </div>
