@@ -5,6 +5,7 @@ import Instance from "../../interceptors/auth_interceptor";
 import { useFileUploader } from "../form/FIleUploader";
 import { IconPhoto, IconMoodSmile } from "@tabler/icons-react"; // 引入所需的图标
 import { UploadZone } from "../form/UploadZone";
+import { useNavigate } from "react-router-dom";
 
 interface CommentModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function CommentModal({
   const [comment, setComment] = useState("");
   const instance = Instance();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   // 使用上传组件逻辑
   const { uploadTasks, handleFileChange, removeUploadTask } = useFileUploader({
     folder: "comment",
@@ -62,13 +64,16 @@ export function CommentModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Comment submitted:", comment);
     try {
+      const fileKeys = uploadTasks
+        .filter((task) => task.status === "success")
+        .map((task) => task.key) as string[];
       await instance.post("/api/comment", {
         content: comment,
         type: "text",
         tweet_id: tweetId,
         parent_id: null,
+        file_keys: fileKeys,
       });
     } catch (error) {
       console.error("Failed to create comment:", error);
@@ -76,6 +81,7 @@ export function CommentModal({
     Toast.show("评论成功");
     setComment("");
     onClose();
+    // navigate(0)
   };
 
   const handleClose = (e: React.MouseEvent) => {

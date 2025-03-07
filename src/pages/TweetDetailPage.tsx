@@ -14,8 +14,9 @@ import {
   IconBookmarkFilled,
 } from "@tabler/icons-react"; // 导入图标
 import Loader from "../component/common/Loader";
-import CommentModal from "../component/comment/CommentModel"; // 引入 CommentModal 组件
+import CommentModal from "../component/comment/CommentModal"; // 引入 CommentModal 组件
 import MediaDisplay from "../component/tweet/MediaDisplay";
+import CommentFeed from "../component/comment/CommentFeed";
 
 const TweetDetailPage: React.FC = () => {
   const instance = Instance();
@@ -247,6 +248,7 @@ const TweetDetailPage: React.FC = () => {
               </span>
             </div>
           </div>
+          {tweet?.id && <CommentFeed tweetId={tweet.id} />}
           {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div

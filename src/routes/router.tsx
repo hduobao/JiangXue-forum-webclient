@@ -32,7 +32,6 @@ const MainRoute = () => {
           <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />
           <Route path="history" element={<ProtectedRoute element={<BrowsingHistoryPage />} />} />
           <Route path="communities" element={<ProtectedRoute element={<CommunityPage />} />} />
-          <Route index element={<Navigate to={!!localStorage.getItem('AccessToken') ? "/home" : "/login"} />} />
         </Route>
       </>
     )

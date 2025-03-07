@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { ListTweetVo } from "../../types/TweetModel";
 import { getUserId } from "../../storage/storage";
 import Instance from "../../interceptors/auth_interceptor";
-import CommentModal from "../comment/CommentModel";
+import CommentModal from "../comment/CommentModal";
 import MediaDisplay from "./MediaDisplay"; // 根据实际路径调整
 
 const Tweet: React.FC<{ tweet: ListTweetVo; onClick: () => void }> = ({

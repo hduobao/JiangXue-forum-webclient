@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken, getRefreshToken, setTokens } from '../storage/storage';
+import { getAccessToken, getRefreshToken, removeTokens, setTokens } from '../storage/storage';
 import { Toast } from 'antd-mobile';
 // import MainRoute from '../routes/router';
 import { useNavigate } from 'react-router-dom';
@@ -26,8 +26,12 @@ function Instance() {
     }
 
     const refreshToken = getRefreshToken();
+    const accessToken = getAccessToken();
+    console.log("refresh:", refreshToken);
+    console.log("access:", accessToken);
     if (!refreshToken) {
-      Toast.show('登录信息过期');
+      Toast.show('执行登录信息过期');
+      removeTokens();
       navigate('/login', { replace: true });
       return Promise.reject(error);
     }
@@ -54,7 +58,8 @@ function Instance() {
       return instance.request(error.config);
     } catch (err) {
       console.error('Error occurred:', err);
-      Toast.show('登录信息过期');
+      Toast.show('报错登录信息过期');
+      removeTokens();
       navigate('/login', { replace: true });
       return Promise.reject(err);
     }
