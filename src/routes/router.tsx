@@ -1,4 +1,4 @@
-import { Route, createBrowserRouter, createRoutesFromElements, Navigate } from 'react-router-dom';
+import { Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import App from '../App';
 import HomePage from '../pages/HomePage';
@@ -13,6 +13,7 @@ import TweetDetailPage from '../pages/TweetDetailPage';
 import CommunityPage from '../pages/CommunityPage';
 import NotificationPage from '../pages/NotificationPage';
 import ExplorePage from '../pages/ExplorePage';
+import MessageDetailPanel from '../component/panels/MessageDetailPanel';
 
 const MainRoute = () => {
   const router = createBrowserRouter(
@@ -27,6 +28,7 @@ const MainRoute = () => {
           <Route path="notifications" element={<ProtectedRoute element={<NotificationPage />} />} />
           <Route path="explore" element={<ProtectedRoute element={<ExplorePage />} />} />
           <Route path="messages" element={<ProtectedRoute element={<MessageCenterPage />} />} />
+          <Route path='message/:type/:userID' element={<ProtectedRoute element={<MessageDetailPanel />} />} />
           <Route path="follows" element={<ProtectedRoute element={<FollowsPage />} />} />
           <Route path="fans" element={<ProtectedRoute element={<FansPage />} />} />
           <Route path="favorites" element={<ProtectedRoute element={<FavoritesPage />} />} />

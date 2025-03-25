@@ -5,9 +5,20 @@ module.exports = {
     "./src/**/*.{html,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      scrollbar: {
+        hide: {
+          '-ms-overflow-style': 'none',  /* IE and Edge */
+          'scrollbar-width': 'none',     /* Firefox */
+          '&::-webkit-scrollbar': {      /* Chrome, Safari, Opera */
+            display: 'none',
+          },
+        },
+      },
+    },
   },
   plugins: [
     require("@tailwindcss/line-clamp"),
+    require('tailwind-scrollbar-hide'),
   ],
 };
