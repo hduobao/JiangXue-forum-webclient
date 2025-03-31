@@ -18,15 +18,17 @@ const FavoritesPage: React.FC = () => {
     const fetchFavorites = async () => {
       try {
         const response = await instance.get('/api/me/favorites');
-        setTweets(response.data.data);
+        const data = response.data?.data;
+        setTweets(Array.isArray(data) ? data : []); // 确保是数组
       } catch (error) {
         console.error('Failed to fetch favorites:', error);
         setError('Failed to load favorites');
+        setTweets([]); // 出错时重置为空数组
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchFavorites();
   }, []);
 

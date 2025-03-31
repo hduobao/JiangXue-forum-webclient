@@ -29,7 +29,7 @@ const TweetDetail: React.FC = () => {
 
     const fetchTweetDetail = async () => {
       try {
-        const response = await instance.get(`/api/1/tweets/${tweetID}`, {
+        const response = await instance.get(`/api/tweets/${tweetID}`, {
           params: {
             forumID,
           },

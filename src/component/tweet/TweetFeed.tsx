@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 导入 useNavigate
-import Instance from '../../interceptors/auth_interceptor';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // 导入 useNavigate
+import Instance from "../../interceptors/auth_interceptor";
 import { ListTweetVo } from "../../types/TweetModel";
-import Tweet from './Tweet'; 
-import Loader from '../common/Loader';
-import BackTopButton from '../button/BackTopButton';
+import Tweet from "./Tweet";
+import Loader from "../common/Loader";
+import BackTopButton from "../button/BackTopButton";
 
 const TweetFeed: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const instance = Instance();
@@ -14,17 +14,17 @@ const TweetFeed: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     const fetchTweets = async () => {
       try {
         const offset = 1;
         const limit = 10;
-        const response = await instance.get(`/api/1/tweets`, {
-          params: { offset, limit, tab : activeTab },
+        const response = await instance.get(`/api/tweets`, {
+          params: { offset, limit, tab: activeTab },
         });
         setTweets(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch tweets:', error);
+        console.error("Failed to fetch tweets:", error);
       } finally {
         setLoading(false);
       }
@@ -63,18 +63,22 @@ const TweetFeed: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const handleTweetClick = (tweetID: number) => {
     navigate(`/tweet/${tweetID.toString()}`); // 将 tweetID 转换为字符串
   };
-  
+
   return (
     <div className="flex justify-center">
       {loading ? (
         <Loader />
       ) : (
-      <div className="w-full max-w-3xl px-4 overflow-y-auto">
-        {tweets.map((tweet, index) => (
-          <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
-        ))}
-        {showBackTopButton && <BackTopButton onClick={scrollToTop} />}
-      </div>
+        <div className="w-full max-w-3xl px-4 overflow-y-auto">
+          {tweets?.map((tweet, index) => (
+            <Tweet
+              key={index}
+              tweet={tweet}
+              onClick={() => handleTweetClick(tweet.id)}
+            />
+          ))}
+          {showBackTopButton && <BackTopButton onClick={scrollToTop} />}
+        </div>
       )}
     </div>
   );

@@ -100,7 +100,6 @@ const MessageCenterPage: React.FC = () => {
             {[
               { id: 'reply', icon: IconRepeat, label: '回复' },
               { id: 'mention', icon: IconAt, label: '提到' },
-              { id: 'notification', icon: IconBell, label: '通知' },
               { id: 'message', icon: IconMail, label: '私信' },
             ].map(({ id, icon: Icon, label }) => (
               <button
@@ -181,7 +180,6 @@ function getTabLabel(type: MessageType): string {
   switch (type) {
     case 'reply': return '回复消息';
     case 'mention': return '提到消息';
-    case 'notification': return '系统通知';
     case 'message': return '私信消息';
     default: return '消息';
   }

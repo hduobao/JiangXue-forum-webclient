@@ -32,7 +32,7 @@ const CommunityPage: React.FC = () => {
       try {
         const offset = 1;
         const limit = 10;
-        const response = await instance.get(`/api/1/tweets`, {
+        const response = await instance.get(`/api/tweets`, {
           params: { offset, limit },
         });
         setTweets(response.data.data);

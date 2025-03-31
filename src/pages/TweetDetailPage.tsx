@@ -66,7 +66,7 @@ const TweetDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchTweet = async () => {
       try {
-        const response = await instance.get(`/api/1/tweets/${tweetID}`);
+        const response = await instance.get(`/api/tweets/${tweetID}`);
         const fetchedTweet = response.data.data;
         setTweet(fetchedTweet);
         tweetRef.current = fetchedTweet; // 将数据保存到 ref 中

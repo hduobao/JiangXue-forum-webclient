@@ -36,7 +36,7 @@ const UserProfile: React.FC = () => {
       <div className="sticky top-0 z-10 bg-white shadow-md">
         <TopBar page={userInfo?.username || "loading..."} />
       </div>
-      <main className="flex-grow overflow-y-auto">
+      <main className="flex-grow overflow-y-auto scroll-container">
         {loading || userInfo === null ? (
           <Loader />
         ) : (
