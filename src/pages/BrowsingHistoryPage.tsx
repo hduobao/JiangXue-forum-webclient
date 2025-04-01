@@ -1,42 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import TopBar from '../component/bar/TopBar';
-import Instance from '../interceptors/auth_interceptor';
+import React, { useEffect, useState } from "react";
+import TopBar from "../component/bar/TopBar";
+import Instance from "../interceptors/auth_interceptor";
 import { ListTweetVo } from "../types/TweetModel";
-import Tweet from '../component/tweet/Tweet'; 
-import Loader from '../component/common/Loader';
+import Loader from "../component/common/Loader";
+import TweetFeed from "../component/tweet/TweetFeed";
+import BackTopButton from "../component/button/BackTopButton";
 
 const BrowsingHistoryPage: React.FC = () => {
   const instance = Instance();
-  const navigate = useNavigate();
   const [history, setHistory] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await instance.get('/api/me/browsing-history');
+        const response = await instance.get("/api/me/browsing-history");
         setHistory(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch browsing history:', error);
-        setError('Failed to load browsing history');
+        console.error("Failed to fetch browsing history:", error);
+        setError("Failed to load browsing history");
       } finally {
         setLoading(false);
       }
     };
 
     fetchHistory();
+
+    const scrollContainer = document.querySelector(".scroll-container");
+    console.log("doc:", scrollContainer);
+    if (!scrollContainer) return;
+    const handleScroll = () => {
+      console.log("aa:", scrollContainer.scrollTop);
+      if (scrollContainer.scrollTop > 200) {
+        setShowBackTopButton(true);
+      } else {
+        setShowBackTopButton(false);
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  const handleTweetClick = (tweetID: number) => {
-    navigate(`/tweet/${tweetID.toString()}`); // 将 tweetID 转换为字符串
+  const scrollToTop = () => {
+    const scrollContainer = document.querySelector(".scroll-container");
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
     <div className="flex-grow flex flex-col h-screen overflow-y-auto">
       <div className="sticky top-0 z-10 bg-white shadow-md">
-        <TopBar page='浏览历史' />
+        <TopBar page="浏览历史" />
       </div>
       <main className="flex-grow overflow-y-auto scroll-container">
         {/* <h1 className="text-2xl font-semibold mb-4">浏览历史</h1> */}
@@ -46,10 +69,9 @@ const BrowsingHistoryPage: React.FC = () => {
           <div className="text-red-500">{error}</div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-3xl px-4 overflow-y-auto">
-              {history.map((tweet, index) => (
-                <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
-              ))}
+            <div className="flex justify-center">
+              <TweetFeed tweets={history} />
+              {showBackTopButton && <BackTopButton onClick={scrollToTop} />}
             </div>
           </div>
         )}

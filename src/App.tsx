@@ -47,7 +47,6 @@ const App = () => {
           </main>
         </div>
 
-        {/* 右侧导航栏 */}
         <div className="w-[350px] h-screen shadow-lg overflow-y-auto flex-shrink-0">
           <RightSidebar />
         </div>

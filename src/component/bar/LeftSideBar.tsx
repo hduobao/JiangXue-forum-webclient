@@ -52,7 +52,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username, account }) => {
   ];
 
   return (
-    <div className="h-screen bg-white text-gray-800 flex flex-col relative overflow-y-auto scroll-container">
+    <div className="h-screen bg-white text-gray-800 flex flex-col relative overflow-y-auto">
       <div className="flex items-center justify-between p-4">
         <img src={`/favorite.svg`} alt="Company Logo" className="h-10" />
         <img src={`/snowflow.svg`} alt="s" className="h-10" />

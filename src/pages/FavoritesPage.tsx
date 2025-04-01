@@ -1,17 +1,17 @@
 // src/pages/FavoritesPage.tsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Instance from '../interceptors/auth_interceptor';
 import { ListTweetVo } from '../types/TweetModel';
 import TopBar from '../component/bar/TopBar';
 import Loader from '../component/common/Loader';
-import Tweet from '../component/tweet/Tweet';
+import TweetFeed from '../component/tweet/TweetFeed';
+import BackTopButton from '../component/button/BackTopButton';
 
 const FavoritesPage: React.FC = () => {
   const [tweets, setTweets] = useState<ListTweetVo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
   const instance = Instance();
 
   useEffect(() => {
@@ -30,10 +30,34 @@ const FavoritesPage: React.FC = () => {
     };
   
     fetchFavorites();
+
+    const scrollContainer = document.querySelector(".scroll-container");
+    console.log("doc:", scrollContainer);
+    if (!scrollContainer) return;
+    const handleScroll = () => {
+      console.log("aa:", scrollContainer.scrollTop);
+      if (scrollContainer.scrollTop > 200) {
+        setShowBackTopButton(true);
+      } else {
+        setShowBackTopButton(false);
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  const handleTweetClick = (tweetId: number) => {
-    navigate(`/tweet/${tweetId}`);
+  
+  const scrollToTop = () => {
+    const scrollContainer = document.querySelector(".scroll-container");
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
@@ -49,11 +73,8 @@ const FavoritesPage: React.FC = () => {
           <div className="text-red-500">{error}</div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-3xl px-4 overflow-y-auto">
-              {tweets.map((tweet, index) => (
-                <Tweet key={index} tweet={tweet} onClick={() => handleTweetClick(tweet.id)} /> // 传递点击事件
-              ))}
-            </div>
+            <TweetFeed tweets={tweets} />
+            {showBackTopButton && <BackTopButton onClick={scrollToTop} />}
           </div>
         )}
       </main>
