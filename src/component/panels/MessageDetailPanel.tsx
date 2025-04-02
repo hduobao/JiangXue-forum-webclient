@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { IconSend, IconArrowLeft } from "@tabler/icons-react";
+import { useParams } from "react-router-dom";
+import { IconSend } from "@tabler/icons-react";
 import Instance from "../../interceptors/auth_interceptor";
 import { getAccessToken } from "../../storage/storage";
 import { nanoid } from "nanoid";
@@ -14,131 +14,113 @@ interface Message {
   sender_avatar: string;
   receiver_id: string;
   content: string;
+  content_type: string;
   type: string;
   timestamp: string;
   status: string;
-  is_own: boolean;
+  is_own?: boolean;
+}
+
+interface UserInfo {
+  id: number;
+  avatar: string;
+  name: string;
 }
 
 const MessageDetailPanel: React.FC = () => {
   const { userID } = useParams<{ userID: string }>();
-  const navigate = useNavigate();
   const instance = Instance();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [selfInfo, setSelfInfo] = useState<UserInfo>();
+  const [friendInfo, setFriendInfo] = useState<UserInfo>();
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{
-    id: string;
-    name: string;
-    avatar: string;
-  } | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const selfInfoRef = useRef<UserInfo>();
 
-  // 加载聊天记录和WebSocket连接
   useEffect(() => {
     const token = getAccessToken();
     if (!token) {
       console.error("No authorization token found");
       return;
     }
-
+  
     const loadChatHistory = async () => {
       try {
         const response = await instance.get(`/api/msg/chat`, {
           params: { targetUserID: userID },
         });
-
-        setMessages(response.data.data);
-
-        if (response.data.data.length > 0) {
-          const firstMessage = response.data.data[0];
-          const currentUserId = firstMessage.is_own
-            ? firstMessage.sender_id
-            : firstMessage.receiver_id;
-          const currentUserName = firstMessage.is_own
-            ? firstMessage.sender_name
-            : "";
-          const currentUserAvatar = firstMessage.is_own
-            ? firstMessage.sender_avatar
-            : "";
-
-          setCurrentUser({
-            id: currentUserId,
-            name: currentUserName,
-            avatar: currentUserAvatar,
-          });
-        }
+  
+        setMessages(response.data.data.messages);
+        setSelfInfo(response.data.data.user_info.self);
+        selfInfoRef.current = response.data.data.user_info.self; // 更新 ref
+        setFriendInfo(response.data.data.user_info.friend);
       } catch (error) {
         console.error("Failed to load messages:", error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     loadChatHistory();
-
-    // 建立WebSocket连接
+  
     const socket = new WebSocket(
       `ws://127.0.0.1:8888/ws/conn?userID=${userID}`,
       [token]
     );
-
+  
     socket.onopen = () => {
       console.log("WebSocket connected");
       setWs(socket);
     };
-
+  
     socket.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
+      console.log("receivedMessage.sender_id:", receivedMessage.sender_id);
+      console.log("selfInfo.id:", selfInfoRef.current?.id); // 这里不会是 undefined 了
+  
       const newMessage: Message = {
         ...receivedMessage,
-        is_own: receivedMessage.sender_id === currentUser?.id,
+        is_own: receivedMessage.sender_id === String(selfInfoRef.current?.id),
       };
+  
       setMessages((prev) => [...prev, newMessage]);
     };
-
+  
     socket.onclose = () => {
       console.log("WebSocket disconnected");
     };
-
+  
     return () => {
       socket.close();
     };
   }, [userID]);
+  
 
   // 自动滚动到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 发送消息
   const sendMessage = async () => {
-    if (!newMessage.trim() || !ws || !currentUser) return;
+    if (!newMessage.trim() || !ws || !selfInfo) return;
 
-    try {
-      const tempMessage: Message = {
-        message_id: nanoid(),
-        sender_id: currentUser.id,
-        sender_name: currentUser.name,
-        sender_avatar: currentUser.avatar, // 使用当前用户头像
-        receiver_id: userID || "",
-        content: newMessage,
-        type: "message",
-        timestamp: new Date().toISOString(),
-        status: "delivered",
-        is_own: true,
-      };
-      console.log("message:", tempMessage);
-
-      // 通过WebSocket发送消息
-      ws.send(JSON.stringify(tempMessage));
-
-      setMessages((prev) => [...prev, tempMessage]);
-      setNewMessage("");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-    }
+    const tempMessage: Message = {
+      message_id: nanoid(),
+      sender_id: selfInfo.id.toString(),
+      sender_name: selfInfo.name,
+      sender_avatar: selfInfo.avatar,
+      receiver_id: friendInfo?.id.toString() || "",
+      content: newMessage,
+      content_type: "text",
+      type: "private",
+      timestamp: new Date().toISOString(),
+      status: "delivered",
+    };
+    setNewMessage("");
+    // 发送到WebSocket
+    ws.send(JSON.stringify(tempMessage));
   };
 
   // 格式化时间显示
@@ -192,7 +174,7 @@ const MessageDetailPanel: React.FC = () => {
               </div>
             ) : (
               messages.map((message, index) => (
-                <React.Fragment key={message.id || message.message_id}>
+                <React.Fragment key={message.message_id}>
                   {/* 日期分隔线 */}
                   {shouldShowDateSeparator(index) && (
                     <div className="flex justify-center my-4">
@@ -211,7 +193,7 @@ const MessageDetailPanel: React.FC = () => {
                     {/* 对方头像 */}
                     {!message.is_own && (
                       <img
-                        src={message.sender_avatar}
+                        src={friendInfo?.avatar}
                         alt="avatar"
                         className="w-10 h-10 rounded-full object-cover"
                         onError={(e) => {
@@ -229,7 +211,7 @@ const MessageDetailPanel: React.FC = () => {
                     >
                       {!message.is_own && (
                         <div className="text-xs text-gray-500 mb-1">
-                          {message.sender_name}
+                          {friendInfo?.name}
                         </div>
                       )}
                       <div
@@ -253,7 +235,7 @@ const MessageDetailPanel: React.FC = () => {
                     {/* 自己头像 */}
                     {message.is_own && (
                       <img
-                        src={message.sender_avatar}
+                        src={selfInfo?.avatar}
                         alt="avatar"
                         className="w-10 h-10 rounded-full object-cover"
                         onError={(e) => {

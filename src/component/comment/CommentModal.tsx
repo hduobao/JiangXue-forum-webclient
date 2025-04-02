@@ -1,17 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { Toast } from "antd-mobile";
 import Instance from "../../interceptors/auth_interceptor";
 import { useFileUploader } from "../form/FIleUploader";
 import { IconPhoto, IconMoodSmile } from "@tabler/icons-react"; // 引入所需的图标
 import { UploadZone } from "../form/UploadZone";
-import { useNavigate } from "react-router-dom";
+import { getAccessToken, getUserId } from "../../storage/storage";
+import { nanoid } from "nanoid";
 
 interface CommentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCommentSuccess?: () => void; 
   tweetId?: number;
   replyingTo?: string;
+  authorID?: number;
   authorAvatar?: string;
   authorName?: string;
   tweetTextContent?: string;
@@ -20,8 +23,10 @@ interface CommentModalProps {
 export function CommentModal({
   isOpen,
   onClose,
+  onCommentSuccess,
   tweetId,
   replyingTo,
+  authorID,
   authorAvatar,
   authorName,
   tweetTextContent,
@@ -29,7 +34,22 @@ export function CommentModal({
   const [comment, setComment] = useState("");
   const instance = Instance();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  const [ws, setWs] = useState<WebSocket | null>(null); // WebSocket状态
+
+  useEffect(() => {
+    // 获取当前用户信息（根据你的认证系统实现）
+    const token = getAccessToken() || "";
+    // 建立WebSocket连接
+    const socket = new WebSocket(
+      `ws://127.0.0.1:8888/ws/conn?userID=${authorID}`,
+      [token]
+    );
+
+    setWs(socket);
+
+    return () => socket.close();
+  }, []);
+
   // 使用上传组件逻辑
   const { uploadTasks, handleFileChange, removeUploadTask } = useFileUploader({
     folder: "comment",
@@ -68,20 +88,38 @@ export function CommentModal({
       const fileKeys = uploadTasks
         .filter((task) => task.status === "success")
         .map((task) => task.key) as string[];
-      await instance.post("/api/comment", {
+      const response = await instance.post("/api/comment", {
         content: comment,
         type: "text",
         tweet_id: tweetId,
         parent_id: null,
         file_keys: fileKeys,
       });
+      if (ws && response.status === 200 && authorID) {
+        const currentUserId = getUserId();
+        if (authorID.toString() != currentUserId) {
+          const notification = {
+            message_id: nanoid(),
+            type: "reply",
+            sender_id: currentUserId,
+            receiver_id: authorID.toString(),
+            content: `评论了你的贴子：${comment}`,
+            content_type : "text",
+            tweet_id: tweetId,
+            timestamp: new Date().toISOString(),
+          };
+          ws.send(JSON.stringify(notification));
+        }
+        if (onCommentSuccess) {
+          onCommentSuccess();
+        }
+      }
     } catch (error) {
       console.error("Failed to create comment:", error);
     }
     Toast.show("评论成功");
     setComment("");
     onClose();
-    // navigate(0)
   };
 
   const handleClose = (e: React.MouseEvent) => {

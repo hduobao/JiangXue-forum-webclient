@@ -29,6 +29,7 @@ const TweetDetailPage: React.FC = () => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0); // 点赞数状态
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 管理弹窗的显示状态
+  const [refreshKey, setRefreshKey] = useState(0); // 新增刷新状态
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,28 +64,27 @@ const TweetDetailPage: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchTweet = async () => {
-      try {
-        const response = await instance.get(`/api/tweets/${tweetID}`);
-        const fetchedTweet = response.data.data;
-        setTweet(fetchedTweet);
-        tweetRef.current = fetchedTweet; // 将数据保存到 ref 中
+  const fetchTweet = async () => {
+    try {
+      const response = await instance.get(`/api/tweets/${tweetID}`);
+      const fetchedTweet = response.data.data;
+      setTweet(fetchedTweet);
+      tweetRef.current = fetchedTweet;
 
-        // 在这里进行空值检查
-        if (fetchedTweet) {
-          setLikeCount(fetchedTweet.interactive_info.like_count);
-          setFavoriteCount(fetchedTweet.interactive_info.favorite_count);
-          setIsLiked(fetchedTweet.interactive_info.is_like);
-          setIsBookmarked(fetchedTweet.interactive_info.is_favorite);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tweet:", error);
-      } finally {
-        setLoading(false);
+      if (fetchedTweet) {
+        setLikeCount(fetchedTweet.interactive_info.like_count);
+        setFavoriteCount(fetchedTweet.interactive_info.favorite_count);
+        setIsLiked(fetchedTweet.interactive_info.is_like);
+        setIsBookmarked(fetchedTweet.interactive_info.is_favorite);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch tweet:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTweet();
   }, [tweetID]);
 
@@ -121,6 +121,13 @@ const TweetDetailPage: React.FC = () => {
       console.log("Leaving the page:", location);
     };
   }, [location]);
+
+    // 新增刷新方法
+    const handleCommentSuccess = () => {
+      // 双重刷新保证数据更新
+      setRefreshKey(prev => prev + 1);
+      fetchTweet(); // 重新获取推文数据
+    };
 
   const handleLike = async () => {
     console.log("like click");
@@ -248,7 +255,7 @@ const TweetDetailPage: React.FC = () => {
               </span>
             </div>
           </div>
-          {tweet?.id && <CommentFeed tweetId={tweet.id} />}
+          {tweet?.id && <CommentFeed key={refreshKey} tweetId={tweet.id} />}
           {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div
@@ -262,8 +269,10 @@ const TweetDetailPage: React.FC = () => {
                 <CommentModal
                   isOpen={isModalOpen}
                   onClose={() => setIsModalOpen(false)}
+                  onCommentSuccess={handleCommentSuccess}
                   replyingTo={tweet?.account}
                   tweetId={tweet?.id}
+                  authorID={tweet?.author_id}
                   authorAvatar={tweet?.author_avatar}
                   authorName={tweet?.author_name}
                   tweetTextContent={tweet?.content}
