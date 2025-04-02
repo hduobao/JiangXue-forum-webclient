@@ -25,36 +25,30 @@ const MessageCenterPage: React.FC = () => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const instance = Instance();
 
-  // 修改processNewMessage方法
+  // 处理新消息
   const processNewMessage = (newMsg: any) => {
     setMessages((prev) => {
-      const currentUserID = getUserId(); // 获取当前用户ID
-
-      // 判断消息方向
+      const currentUserID = getUserId();
       const isOwnMessage = newMsg.sender_id === currentUserID;
       const otherUserID = isOwnMessage ? newMsg.receiver_id : newMsg.sender_id;
 
       // 查找已有会话
       const existingIndex = prev.findIndex(
-        (m) => m.sender_id === otherUserID || m.receiver_id === otherUserID
+        (m) =>
+          (m.sender_id === currentUserID && m.receiver_id === otherUserID) ||
+          (m.receiver_id === currentUserID && m.sender_id === otherUserID)
       );
 
       // 新会话处理
       if (existingIndex === -1) {
         return [
           {
-            message_id: newMsg.message_id,
-            sender_id: newMsg.sender_id,
-            sender_name: newMsg.sender_name,
-            sender_avatar: newMsg.sender_avatar, // 使用消息中的头像
-            receiver_id: newMsg.receiver_id,
-            content: newMsg.content,
-            timestamp: newMsg.timestamp,
-            status: "unread",
+            ...newMsg,
             is_own: isOwnMessage,
-            unread_count: isOwnMessage ? 0 : 1, // 自己发的消息未读为0
+            unread_count: isOwnMessage ? 0 : 1, // 新消息前端控制未读数
+            sender_name: isOwnMessage ? "我" : newMsg.sender_name
           },
-          ...prev,
+          ...prev
         ];
       }
 
@@ -66,31 +60,33 @@ const MessageCenterPage: React.FC = () => {
         ...existing,
         content: newMsg.content,
         timestamp: newMsg.timestamp,
-        unread_count: existing.unread_count + (isOwnMessage ? 0 : 1),
-        sender_avatar: isOwnMessage
-          ? existing.sender_avatar
-          : newMsg.sender_avatar, // 保持原有头像
+        // 仅在前端增加未读数（如果是对方消息）
+        unread_count: isOwnMessage ? existing.unread_count : existing.unread_count + 1,
+        sender_avatar: isOwnMessage ? existing.sender_avatar : newMsg.sender_avatar
       };
 
       // 置顶会话
-      const [latest] = updatedMessages.splice(existingIndex, 1);
-      return [latest, ...updatedMessages];
+      const [updated] = updatedMessages.splice(existingIndex, 1);
+      return [updated, ...updatedMessages];
     });
   };
 
-  // 修改获取消息列表的方法
+  // 获取消息列表
   const fetchMessages = async () => {
     setLoading(true);
     try {
       const response = await instance.get("/api/msg/history", {
-        params: { type: "private" },
+        params: { type: "private" }
       });
 
-      // 处理未读数逻辑
+      const currentUserID = getUserId();
+
+      // 初始未读数使用后端返回的值
       const processedData = response.data.data.map((msg: MessageBubble) => ({
         ...msg,
-        // 确保自己发的消息未读数为0
-        unread_count: msg.is_own ? 0 : msg.unread_count,
+        is_own: msg.sender_id === currentUserID,
+        // 保持后端返回的未读数
+        unread_count: msg.unread_count || 0
       }));
 
       setMessages(processedData);
@@ -101,6 +97,7 @@ const MessageCenterPage: React.FC = () => {
       setLoading(false);
     }
   };
+
   // 初始化WebSocket
   useEffect(() => {
     const token = getAccessToken();
@@ -117,15 +114,10 @@ const MessageCenterPage: React.FC = () => {
       setWs(socket);
     };
 
-    // 修改WebSocket消息处理
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // 确保消息结构包含正确的未读数
       if (data.type === "private") {
-        processNewMessage({
-          ...data,
-          unread_count: data.unread_count, // 使用服务端计算的未读数
-        });
+        processNewMessage(data); // 直接使用原始数据，不覆盖unread_count
       }
     };
 
@@ -163,9 +155,7 @@ const MessageCenterPage: React.FC = () => {
     });
   };
 
-  // 判断是否显示未读标记
   const shouldShowUnreadBadge = (msg: MessageBubble) => {
-    // 最后一条消息不是自己发的 且 有未读消息
     return !msg.is_own && msg.unread_count > 0;
   };
 
@@ -190,9 +180,7 @@ const MessageCenterPage: React.FC = () => {
                   >
                     <div className="relative flex-shrink-0">
                       <img
-                        src={
-                          msg.sender_avatar || "https://via.placeholder.com/48"
-                        }
+                        src={msg.sender_avatar || "https://via.placeholder.com/48"}
                         alt="avatar"
                         className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
@@ -200,7 +188,6 @@ const MessageCenterPage: React.FC = () => {
                             "https://via.placeholder.com/48";
                         }}
                       />
-                      {/* 修改未读标记显示逻辑 */}
                       {shouldShowUnreadBadge(msg) && (
                         <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                           {msg.unread_count > 9 ? "9+" : msg.unread_count}
@@ -212,12 +199,6 @@ const MessageCenterPage: React.FC = () => {
                       <div className="flex justify-between items-baseline">
                         <h3 className="text-sm font-medium text-gray-900 truncate">
                           {msg.sender_name}
-                          {/* 在名称后添加未读标记（可选） */}
-                          {shouldShowUnreadBadge(msg) && (
-                            <span className="ml-2 inline-block bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                              {msg.unread_count > 9 ? "9+" : msg.unread_count}
-                            </span>
-                          )}
                         </h3>
                         <span className="text-xs text-gray-500 ml-2 whitespace-nowrap">
                           {formatTime(msg.timestamp)}

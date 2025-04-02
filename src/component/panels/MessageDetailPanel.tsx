@@ -40,12 +40,7 @@ const MessageDetailPanel: React.FC = () => {
   const selfInfoRef = useRef<UserInfo>();
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      console.error("No authorization token found");
-      return;
-    }
-  
+
     const loadChatHistory = async () => {
       try {
         const response = await instance.get(`/api/msg/chat`, {
@@ -64,9 +59,16 @@ const MessageDetailPanel: React.FC = () => {
     };
   
     loadChatHistory();
-  
+  }, [userID]);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      console.error("No authorization token found");
+      return;
+    }
     const socket = new WebSocket(
-      `ws://127.0.0.1:8888/ws/conn?userID=${userID}`,
+      `ws://127.0.0.1:8888/ws/conn?userID=${selfInfo?.id}`,
       [token]
     );
   
@@ -95,7 +97,7 @@ const MessageDetailPanel: React.FC = () => {
     return () => {
       socket.close();
     };
-  }, [userID]);
+  }, [selfInfo?.id]) 
   
 
   // 自动滚动到底部
@@ -103,25 +105,30 @@ const MessageDetailPanel: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !ws || !selfInfo) return;
+const sendMessage = async () => {
+  if (!newMessage.trim() || !ws || !selfInfo) return;
 
-    const tempMessage: Message = {
-      message_id: nanoid(),
-      sender_id: selfInfo.id.toString(),
-      sender_name: selfInfo.name,
-      sender_avatar: selfInfo.avatar,
-      receiver_id: friendInfo?.id.toString() || "",
-      content: newMessage,
-      content_type: "text",
-      type: "private",
-      timestamp: new Date().toISOString(),
-      status: "delivered",
-    };
-    setNewMessage("");
-    // 发送到WebSocket
-    ws.send(JSON.stringify(tempMessage));
-  };
+  const tempMessage: Message = {
+    message_id: nanoid(),
+    sender_id: selfInfo.id.toString(),
+    sender_name: selfInfo.name,
+    sender_avatar: selfInfo.avatar,
+    receiver_id: friendInfo?.id.toString() || "",
+    content: newMessage,
+    content_type: "text",
+    type: "private",
+    timestamp: new Date().toISOString(),
+    status: "delivered",
+    is_own: true, // 这里添加 isOwn
+  }; 
+
+  setMessages((prev) => [...prev, tempMessage]);
+  setNewMessage("");
+  
+  // 发送到 WebSocket
+  ws.send(JSON.stringify(tempMessage));
+};
+
 
   // 格式化时间显示
   const formatTime = (timestamp: string) => {
