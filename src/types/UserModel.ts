@@ -13,6 +13,7 @@ export interface UserBaseInfo {
     username: string;
     account: string;
     avatar: string;
+    profile_background: string;
     created_at: string;
     email: string;
     phone_number: string;

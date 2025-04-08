@@ -7,12 +7,12 @@ import { useNavigate } from "react-router-dom";
 import Instance from "../../interceptors/auth_interceptor";
 import { getUserId } from "../../storage/storage";
 import EditProfileForm from "./EditProfileForm";
-import PostModal from "../form/TweetPublishForm";
 
 const UserSpaceInfoCard: React.FC<{
   userInfo: UserBaseInfo;
   isOwnProfile: boolean;
-}> = ({ userInfo, isOwnProfile }) => {
+  onProfileUpdated?: () => void;  // 添加这行
+}> = ({ userInfo, isOwnProfile, onProfileUpdated }) => {
   const userId = getUserId();
   const instance = Instance();
   const navigate = useNavigate();
@@ -29,6 +29,17 @@ const UserSpaceInfoCard: React.FC<{
 
   const handleCloseModal = () => {
     setModalData(null);
+  };
+  const handleProfileSubmit = async (updatedUserInfo: Partial<UserBaseInfo>) => {
+    try {
+      // 使用 PATCH 方法发送部分更新
+      const response = await instance.put("/api/users", updatedUserInfo);
+      console.log("Profile updated successfully:", response.data);
+      onProfileUpdated?.();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
   };
 
   const formatDate = (dateString: string, type: "birthday" | "createdAt") => {
@@ -95,9 +106,9 @@ const UserSpaceInfoCard: React.FC<{
           <div className="w-full h-48 bg-cover bg-center rounded-t-lg">
             <img
               alt="User BG"
-              src={"/login_bg.svg"}
+              src={userInfo.profile_background || "/login_bg.svg"}
               className="w-full h-full object-cover cursor-pointer"
-              onClick={() => handleImageClick("bg", "/login_bg.svg")}
+              onClick={() => handleImageClick("bg", userInfo.profile_background || "/login_bg.svg")}
             />
           </div>
 
@@ -166,6 +177,7 @@ const UserSpaceInfoCard: React.FC<{
           <div className="bg-gray p-10 rounded-lg shadow-lg z-10 w-[35%] min-h-[90vh] overflow-auto">
             <EditProfileForm
               userInfo={userInfo} // 传递用户信息
+              onSubmit={handleProfileSubmit}
               onClose={() => setIsEditModalOpen(false)} // 传递关闭弹窗的函数
             />
           </div>

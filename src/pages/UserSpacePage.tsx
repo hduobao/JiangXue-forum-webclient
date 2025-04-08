@@ -11,23 +11,29 @@ const UserProfile: React.FC = () => {
   const { authorID } = useParams<{ authorID?: string }>();
   const [userInfo, setUserInfo] = useState<UserBaseInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshKey, setRefreshKey] = useState(0); // 新增刷新状态
+
+  const fetchUserInfo = async () => {
+    try {
+      const endpoint = authorID
+        ? `/api/users/${authorID}/info`
+        : "/api/me/info";
+      const response = await instance.get(endpoint);
+      setUserInfo(response.data.data);
+      setLoading(true);
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
+    fetchUserInfo();
+  };
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const endpoint = authorID
-          ? `/api/users/${authorID}/info`
-          : "/api/me/info";
-        const response = await instance.get(endpoint);
-        setUserInfo(response.data.data);
-        setLoading(true);
-      } catch (error) {
-        console.error("Failed to fetch user info:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserInfo();
   }, [authorID]);
 
@@ -40,7 +46,7 @@ const UserProfile: React.FC = () => {
         {loading || userInfo === null ? (
           <Loader />
         ) : (
-          <UserSpaceInfoCard userInfo={userInfo} isOwnProfile={!authorID} />
+          <UserSpaceInfoCard userInfo={userInfo} isOwnProfile={!authorID} onProfileUpdated={handleEditSuccess} />
         )}
       </main>
     </div>

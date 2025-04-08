@@ -8,12 +8,7 @@ import { useFileUploader } from "../form/FIleUploader";
 const EditProfileForm: React.FC<{
   userInfo: UserBaseInfo;
   onClose: () => void;
-  onSubmit: (data: {
-    username: string;
-    bio: string;
-    avatar?: string;
-    bgImage?: string;
-  }) => void;
+  onSubmit: (data: Partial<UserBaseInfo>) => void; 
 }> = ({ userInfo, onClose, onSubmit }) => {
   const instance = Instance();
   const [username, setUsername] = useState(userInfo.username || "");
@@ -70,32 +65,52 @@ const EditProfileForm: React.FC<{
       setError("用户名不能为空");
       return;
     }
-
-    // 检查上传状态
+  
     const isUploading = [
       ...avatarUploader.uploadTasks,
       ...bgUploader.uploadTasks,
     ].some(t => t.status === "pending" || t.status === "uploading");
-
+  
     if (isUploading) {
       setError("请等待图片上传完成");
       return;
     }
-
-    // 获取上传成功的文件 key
+  
+    // 创建差异对象
+    const updatedFields: Partial<UserBaseInfo> = {};
+    
+    updatedFields.id = userInfo.id;
+    // 基础字段比较
+    if (username.trim() !== userInfo.username) {
+      updatedFields.username = username.trim();
+    }
+    if (bio.trim() !== userInfo.bio) {
+      updatedFields.bio = bio.trim();
+    }
+  
+    // 处理头像
     const avatarKey = avatarUploader.uploadTasks.find(
       t => t.status === "success"
-    )?.key;
+    )?.key?.trim();
+    if (avatarKey && avatarKey !== userInfo.avatar) {
+      updatedFields.avatar = avatarKey;
+    }
+  
+    // 处理背景图
     const bgImageKey = bgUploader.uploadTasks.find(
       t => t.status === "success"
-    )?.key;
-
-    onSubmit({
-      username: username.trim(),
-      bio: bio.trim(),
-      ...(avatarKey && { avatar: avatarKey }),
-      ...(bgImageKey && { bgImage: bgImageKey }),
-    });
+    )?.key?.trim();
+    if (bgImageKey && bgImageKey !== userInfo.profile_background) {
+      updatedFields.profile_background = bgImageKey;
+    }
+  
+    // 如果没有修改任何字段
+    if (Object.keys(updatedFields).length === 0) {
+      onClose();
+      return;
+    }
+  
+    onSubmit(updatedFields);
     onClose();
   };
 
@@ -150,7 +165,7 @@ const EditProfileForm: React.FC<{
             <div className="group relative w-full h-48 bg-cover bg-center rounded-t-lg overflow-hidden">
               <img
                 alt="背景图"
-                src={bgPreview}
+                src={userInfo.profile_background || bgPreview}
                 className="w-full h-full object-cover"
               />
               <input
