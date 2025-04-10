@@ -30,7 +30,7 @@ const RightSidebar: React.FC<RightSidebarProps> = () => {
 
       {/* 趋势话题 */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="text-lg font-bold mb-3">趋势话题</h2>
+        <h2 className="text-lg font-bold mb-3">热点话题</h2>
         <ul>
           {trendingTopics.map((topic, index) => (
             <li key={index} className="mb-4">

@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
 interface StyledWrapperProps {
   width?: string;
   searchContent?: string;
+  onSearch?: (query: string) => void; // 新增搜索回调函数
 }
 
-const SearchForm = ({ width = '300px', searchContent = '' }: StyledWrapperProps) => {
-  // 使用 useState 管理输入框内容
+const SearchForm = ({
+  width = "300px",
+  searchContent = "",
+  onSearch,
+}: StyledWrapperProps) => {
   const [searchText, setSearchText] = useState(searchContent);
 
-  // 当 searchContent 发生变化时更新输入框内容
   useEffect(() => {
     setSearchText(searchContent);
   }, [searchContent]);
@@ -19,9 +22,23 @@ const SearchForm = ({ width = '300px', searchContent = '' }: StyledWrapperProps)
     setSearchText(e.target.value);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSearch) {
+      onSearch(searchText); // 提交时触发搜索回调
+    }
+  };
+
+  const handleReset = () => {
+    setSearchText("");
+    if (onSearch) {
+      onSearch(""); // 重置时也触发搜索回调
+    }
+  };
+
   return (
     <StyledWrapper width={width}>
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <label htmlFor="search">
           <input
             className="input"
@@ -29,8 +46,8 @@ const SearchForm = ({ width = '300px', searchContent = '' }: StyledWrapperProps)
             required
             placeholder="Search"
             id="search"
-            value={searchText} // 设置输入框的值
-            onChange={handleChange} // 更新输入框的内容
+            value={searchText}
+            onChange={handleChange}
           />
           <div className="fancy-bg" />
           <div className="search">
@@ -44,15 +61,22 @@ const SearchForm = ({ width = '300px', searchContent = '' }: StyledWrapperProps)
               </g>
             </svg>
           </div>
-          <button className="close-btn" type="reset" onClick={() => setSearchText('')}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+          {searchText && (
+            <button className="close-btn" type="button" onClick={handleReset}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
         </label>
       </form>
     </StyledWrapper>
@@ -67,7 +91,8 @@ const StyledWrapper = styled.div<StyledWrapperProps>`
     --focus-input-bg-color: transparent;
     --text-color: #949faa; /* 保持原来的 text-color */
     --active-color: #1b9bee;
-    --width-of-input: ${(props) => props.width || '200px'}; /* 默认宽度为 200px */
+    --width-of-input: ${(props) =>
+      props.width || "200px"}; /* 默认宽度为 200px */
     --inline-padding-of-input: 1.2em;
     --gap: 0.9rem;
   }
@@ -169,7 +194,7 @@ const StyledWrapper = styled.div<StyledWrapperProps>`
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    -webkit-transition: 'color 9999s ease-out, background-color 9999s ease-out';
+    -webkit-transition: "color 9999s ease-out, background-color 9999s ease-out";
     -webkit-transition-delay: 9999s;
   }
 `;

@@ -147,7 +147,7 @@ const CommentFeed = ({ tweetId }: CommentListProps) => {
                 )}
 
                 {/* 互动按钮 */}
-                <div className="flex items-center gap-4 mt-3 text-gray-500">
+                {/* <div className="flex items-center gap-4 mt-3 text-gray-500">
                   <button className="flex items-center gap-1.5 hover:text-pink-500 transition-colors">
                     <Heart size={18} />
                     <span className="text-sm">42</span>
@@ -157,7 +157,7 @@ const CommentFeed = ({ tweetId }: CommentListProps) => {
                     <MessageCircle size={18} />
                     <span className="text-sm">Reply</span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

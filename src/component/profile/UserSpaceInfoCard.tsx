@@ -63,6 +63,10 @@ const UserSpaceInfoCard: React.FC<{
     return "";
   };
 
+  const handleMailClick = () => {
+    navigate(`/message/private/${userInfo.id}`)
+  }
+
   const handleSearchClick = () => {
     navigate("/explore", { state: { account: userInfo.account } });
   };
@@ -108,7 +112,7 @@ const UserSpaceInfoCard: React.FC<{
               alt="User BG"
               src={userInfo.profile_background || "/login_bg.svg"}
               className="w-full h-full object-cover cursor-pointer"
-              onClick={() => handleImageClick("bg", userInfo.profile_background || "/login_bg.svg")}
+              onClick={() => handleImageClick("bg",  "/login_bg.svg")}
             />
           </div>
 
@@ -131,6 +135,7 @@ const UserSpaceInfoCard: React.FC<{
           ) : (
             <OtherProfileButtonGroup
               followStatus={followStatus}
+              handleMailClick={handleMailClick}
               handleSearchClick={handleSearchClick}
               handleFollowClick={handleFollowClick}
             />
@@ -140,7 +145,7 @@ const UserSpaceInfoCard: React.FC<{
         {/* 用户名和位置 */}
         <div className="ml-6 mb-6 mt-20 space-y-2">
           <h1 className="text-xl font-semibold">{userInfo.username}</h1>
-          <p className="text-sm text-gray-500">@{userInfo.account}</p>{" "}
+          <p className="text-sm text-gray-500">@{userInfo.account}</p>
           <p className="text-black-600">
             {userInfo.bio || "该用户没有填写个人简介"}
           </p>
@@ -148,7 +153,7 @@ const UserSpaceInfoCard: React.FC<{
             <p className="flex items-center space-x-2">
               <IconBalloon className="text-lg" />
               <span className="text-gray-500">
-                生日{" "}
+                生日
                 {userInfo.birthday
                   ? formatDate(userInfo.birthday, "birthday")
                   : "未填写生日"}
@@ -158,7 +163,7 @@ const UserSpaceInfoCard: React.FC<{
             <p className="flex items-center space-x-2">
               <IconCalendarWeek className="text-lg" />
               <span className="text-gray-500">
-                注册日期{" "}
+                注册日期
                 {userInfo.created_at
                   ? formatDate(userInfo.created_at, "createdAt")
                   : "未填写注册日期"}

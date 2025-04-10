@@ -17,7 +17,7 @@ const BrowsingHistoryPage: React.FC = () => {
     const fetchHistory = async () => {
       try {
         const response = await instance.get("/api/me/browsing-history");
-        setHistory(response.data.data);
+        setHistory(response.data.data.list);
       } catch (error) {
         console.error("Failed to fetch browsing history:", error);
         setError("Failed to load browsing history");

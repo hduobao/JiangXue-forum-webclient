@@ -47,7 +47,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({ avatar, username, account }) => {
     { icon: <IconMessageCircle />, label: "消息", route: "/messages" },
     { icon: <IconHistory />, label: "历史", route: "/history" },
     { icon: <IconBookmark />, label: "收藏", route: "/favorites" },
-    { icon: <IconUsers />, label: "社区", route: "/communities" },
+    { icon: <IconUsers />, label: "话题", route: "/communities" },
     { icon: <IconUser />, label: "空间", route: "/user-profile" },
   ];
 

@@ -47,7 +47,7 @@ const MessageDetailPanel: React.FC = () => {
           params: { targetUserID: userID },
         });
   
-        setMessages(response.data.data.messages);
+        setMessages(response.data.data.messages || []);
         setSelfInfo(response.data.data.user_info.self);
         selfInfoRef.current = response.data.data.user_info.self; // 更新 ref
         setFriendInfo(response.data.data.user_info.friend);

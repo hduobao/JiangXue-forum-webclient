@@ -4,6 +4,7 @@ import TopBar from "../component/bar/TopBar";
 import Loader from "../component/common/Loader";
 import Instance from "../interceptors/auth_interceptor";
 import { getAccessToken, getUserId } from "../storage/storage";
+import MessagePlusButton from "../component/button/MessagePlusButton";
 
 interface MessageBubble {
   message_id: string;
@@ -24,6 +25,7 @@ const MessageCenterPage: React.FC = () => {
   const [messages, setMessages] = useState<MessageBubble[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const instance = Instance();
+
 
   // 处理新消息
   const processNewMessage = (newMsg: any) => {
@@ -46,9 +48,9 @@ const MessageCenterPage: React.FC = () => {
             ...newMsg,
             is_own: isOwnMessage,
             unread_count: isOwnMessage ? 0 : 1, // 新消息前端控制未读数
-            sender_name: isOwnMessage ? "我" : newMsg.sender_name
+            sender_name: isOwnMessage ? "我" : newMsg.sender_name,
           },
-          ...prev
+          ...prev,
         ];
       }
 
@@ -61,8 +63,12 @@ const MessageCenterPage: React.FC = () => {
         content: newMsg.content,
         timestamp: newMsg.timestamp,
         // 仅在前端增加未读数（如果是对方消息）
-        unread_count: isOwnMessage ? existing.unread_count : existing.unread_count + 1,
-        sender_avatar: isOwnMessage ? existing.sender_avatar : newMsg.sender_avatar
+        unread_count: isOwnMessage
+          ? existing.unread_count
+          : existing.unread_count + 1,
+        sender_avatar: isOwnMessage
+          ? existing.sender_avatar
+          : newMsg.sender_avatar,
       };
 
       // 置顶会话
@@ -76,7 +82,7 @@ const MessageCenterPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await instance.get("/api/msg/history", {
-        params: { type: "private" }
+        params: { type: "private" },
       });
 
       const currentUserID = getUserId();
@@ -86,7 +92,7 @@ const MessageCenterPage: React.FC = () => {
         ...msg,
         is_own: msg.sender_id === currentUserID,
         // 保持后端返回的未读数
-        unread_count: msg.unread_count || 0
+        unread_count: msg.unread_count || 0,
       }));
 
       setMessages(processedData);
@@ -180,7 +186,9 @@ const MessageCenterPage: React.FC = () => {
                   >
                     <div className="relative flex-shrink-0">
                       <img
-                        src={msg.sender_avatar || "https://via.placeholder.com/48"}
+                        src={
+                          msg.sender_avatar || "https://via.placeholder.com/48"
+                        }
                         alt="avatar"
                         className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
@@ -218,6 +226,7 @@ const MessageCenterPage: React.FC = () => {
             </>
           )}
         </div>
+        <MessagePlusButton />
       </main>
     </div>
   );

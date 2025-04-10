@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IconArrowLeft } from "@tabler/icons-react";
 import SearchForm from "../form/SearchForm";
@@ -7,7 +7,8 @@ const TopBar: React.FC<{
   page: string; 
   activeTab?: string; 
   setActiveTab?: React.Dispatch<React.SetStateAction<string>> 
-}> = ({ page, activeTab = '', setActiveTab = () => {} }) => {
+  onSearch?: (query: string) => void;
+}> = ({ page, activeTab = '', setActiveTab = () => {}, onSearch }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -42,7 +43,7 @@ const TopBar: React.FC<{
         ) : isExplorePage ? (
           // 搜索框居中的样式
           <div className="flex justify-center items-center w-full p-4">
-            <SearchForm width="500px" searchContent={page} />
+            <SearchForm width="500px" searchContent={page} onSearch={onSearch} />
           </div>
         ) : (
           // 返回按钮

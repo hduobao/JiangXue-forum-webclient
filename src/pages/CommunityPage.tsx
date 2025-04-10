@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Loader from "../component/common/Loader";
 import TopBar from "../component/bar/TopBar";
 import Instance from "../interceptors/auth_interceptor";
@@ -15,70 +15,111 @@ const CommunityPage: React.FC = () => {
   const [showBackTopButton, setShowBackTopButton] = useState<boolean>(false);
   const [forums, setForums] = useState<ForumVo[]>([]);
   const [selectedForumId, setSelectedForumId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const scrollContainerRef = useRef<HTMLElement>(null);
 
+  // 加载论坛列表（保持原有）
   useEffect(() => {
     const fetchForum = async () => {
       try {
         const response = await instance.get("/api/forum/list");
         setForums(response.data.data);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Failed to fetch forums:", error);
+      }
     };
     fetchForum();
   }, []);
 
-  useEffect(() => {
-    const fetchTweets = async () => {
+  // 分页加载推文
+  const loadTweets = useCallback(
+    async (pageNumber: number, isNewLoad: boolean) => {
       try {
         setLoading(true);
-        const offset = 1;
-        const limit = 10;
+        const pageSize = 10;
         const response = await instance.get(`/api/tweets`, {
           params: { 
-            offset, 
-            limit,
+            offset: pageNumber,
+            limit: pageSize,
             forum: selectedForumId
           },
         });
-        setTweets(response.data.data);
+
+        const data = response.data.data;
+        const newTweets = Array.isArray(data.list) ? data.list : [];
+
+        if (isNewLoad) {
+          setTweets(newTweets);
+        } else {
+          setTweets(prev => [...prev, ...newTweets]);
+        }
+
+        // 判断是否还有更多数据
+        const more = data.page * data.pageSize < data.total;
+        setHasMore(more);
+        setPage(pageNumber + 1);
       } catch (error) {
         console.error("Failed to fetch tweets:", error);
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [selectedForumId, instance]
+  );
 
-    fetchTweets();
+  // 初始化加载和论坛切换
+  useEffect(() => {
+    setPage(1);
+    loadTweets(1, true);
+  }, [selectedForumId]);
 
-    const scrollContainer = document.querySelector(".scroll-container");
+  // 滚动处理
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
     const handleScroll = () => {
       setShowBackTopButton(scrollContainer.scrollTop > 200);
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      const threshold = 100;
+
+      if (
+        scrollHeight > clientHeight &&
+        scrollHeight - (scrollTop + clientHeight) < threshold &&
+        !loading &&
+        hasMore
+      ) {
+        loadTweets(page, false);
+      }
     };
 
     scrollContainer.addEventListener("scroll", handleScroll);
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, [selectedForumId]); // 核心变化：依赖项增加 selectedForumId
+  }, [loading, hasMore, page]);
 
-  // 滚动到顶部（保持原有）
   const scrollToTop = () => {
-    const scrollContainer = document.querySelector(".scroll-container");
+    const scrollContainer = scrollContainerRef.current;
     scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <div className="flex-grow flex flex-col h-screen overflow-y-auto">
+    <div className="flex flex-col h-screen overflow-hidden">
       <div className="sticky top-0 z-10 bg-white shadow-md">
-        <TopBar page="社区" />
+        <TopBar page="话题" />
       </div>
-      <main className="flex-grow overflow-y-auto scroll-container">
-        {loading ? (
+      <main
+        ref={scrollContainerRef}
+        className="flex-grow overflow-y-scroll scroll-container"
+      >
+        {loading && page === 1 ? (
           <Loader />
         ) : (
           <div>
             <ForumButtonBar 
               forums={forums} 
-              onSelectForum={setSelectedForumId} // 直接传递状态更新函数
+              onSelectForum={setSelectedForumId}
             />
             <div className="flex justify-center">
               <TweetFeed tweets={tweets} />

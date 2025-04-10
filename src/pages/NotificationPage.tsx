@@ -44,8 +44,9 @@ const NotificationPage: React.FC = () => {
         const response = await instance.get('/api/msg/history', {
           params: { type: activeTab }
         });
-        const message_bubbles: MessageBubble[] = response.data.data;
-        
+      
+        const message_bubbles: MessageBubble[] = response.data.data || [];
+  
         const convertedConversations = message_bubbles.map(msg => {
           const is_system = msg.type === 'notification';
           return {
@@ -61,15 +62,16 @@ const NotificationPage: React.FC = () => {
             unread: msg.status === 'read' ? 0 : 1,
           };
         });
-
+  
         setConversations(convertedConversations);
       } catch (error) {
         console.error('获取消息列表失败:', error);
+        setConversations([]); // 出错时清空列表
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchMessages();
   }, [activeTab]);
 
